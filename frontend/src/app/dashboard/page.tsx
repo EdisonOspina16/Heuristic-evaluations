@@ -1,13 +1,16 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
+import Link from "next/link"
 import { 
   Plus, 
   ArrowUpRight, 
   MoreHorizontal, 
   Clock, 
   CheckCircle2, 
-  AlertCircle 
+  AlertCircle,
+  FileText,
+  Loader2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { 
@@ -18,51 +21,44 @@ import {
   CardContent 
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { evaluationsService } from "@/features/evaluations/services/evaluations.service"
+import { Plantilla } from "@/types/evaluations"
 
-const projects = [
-  {
-    id: 1,
-    name: "App Bancaria",
-    description: "Evaluación de usabilidad para el flujo de transferencias.",
-    status: "In Progress",
-    progress: 65,
-    lastUpdate: "2h ago",
-    evaluations: 12,
-  },
-  {
-    id: 2,
-    name: "E-commerce Redesign",
-    description: "Optimización del checkout y carrito de compras.",
-    status: "Completed",
-    progress: 100,
-    lastUpdate: "1d ago",
-    evaluations: 24,
-  },
-  {
-    id: 3,
-    name: "Landing Page Saas",
-    description: "Evaluación heurística de la landing principal.",
-    status: "Pending",
-    progress: 15,
-    lastUpdate: "5h ago",
-    evaluations: 4,
-  },
-]
-
-const stats = [
-  { label: "Proyectos Activos", value: "3", change: "+12%", icon: Clock },
-  { label: "Evaluaciones Totales", value: "40", change: "+5", icon: CheckCircle2 },
-  { label: "Promedio Global", value: "4.2", change: "+0.3", icon: AlertCircle },
-]
-
+/**
+ * Página de Dashboard principal.
+ * Muestra el resumen de proyectos y permite iniciar nuevas evaluaciones.
+ */
 export default function DashboardPage() {
+  const [plantillas, setPlantillas] = useState<Plantilla[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await evaluationsService.getPlantillas()
+        setPlantillas(data)
+      } catch (err) {
+        console.error("Error loading templates:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [])
+
+  const stats = [
+    { label: "Plantillas Disponibles", value: plantillas.length.toString(), change: "Activas", icon: FileText },
+    { label: "Evaluaciones Totales", value: "0", change: "+0", icon: CheckCircle2 },
+    { label: "Promedio Global", value: "0.0", change: "N/A", icon: AlertCircle },
+  ]
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-10">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Dashboard</h1>
-          <p className="text-zinc-500 mt-1">Bienvenido de nuevo, Edison. Aquí tienes un resumen de tus evaluaciones.</p>
+          <p className="text-zinc-500 mt-1">Bienvenido de nuevo. Aquí tienes las herramientas para tus evaluaciones de usabilidad.</p>
         </div>
         <Button className="gap-2">
           <Plus className="w-4 h-4" />
@@ -83,111 +79,88 @@ export default function DashboardPage() {
             <CardContent>
               <div className="text-3xl font-bold">{stat.value}</div>
               <p className="text-xs text-zinc-500 mt-1">
-                <span className="text-emerald-500 font-medium">{stat.change}</span> respecto al mes pasado
+                <span className="text-emerald-500 font-medium">{stat.change}</span>
               </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Projects Grid */}
+      {/* Templates Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Proyectos Recientes</h2>
-          <Button variant="ghost" size="sm" className="text-brand-400 hover:text-brand-300">
-            Ver todos <ArrowUpRight className="ml-1 w-3 h-3" />
-          </Button>
+          <h2 className="text-xl font-semibold text-white">Plantillas de Evaluación</h2>
+          <Badge variant="outline" className="border-brand-500/20 text-brand-400">
+            {loading ? "Cargando..." : "Listas para usar"}
+          </Badge>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <Card key={project.id} className="group cursor-pointer hover:bg-white/[0.03]">
-              <CardHeader className="pb-4">
-                <div className="flex justify-between items-start mb-2">
-                   <Badge variant={project.status === 'Completed' ? 'success' : project.status === 'In Progress' ? 'default' : 'secondary'}>
-                    {project.status}
-                  </Badge>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 -mr-2">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
+        {loading ? (
+          <div className="flex justify-center p-12">
+            <Loader2 className="w-8 h-8 animate-spin text-brand-500" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {plantillas.map((plantilla) => (
+              <Card key={plantilla.id} className="group relative overflow-hidden hover:bg-white/[0.03] transition-all">
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                   <FileText className="w-12 h-12" />
                 </div>
-                <CardTitle className="text-lg group-hover:text-brand-400 transition-colors">
-                  {project.name}
-                </CardTitle>
-                <CardDescription className="line-clamp-2 mt-2">
-                  {project.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Progress Bar */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs font-medium">
-                    <span className="text-zinc-500">Progreso</span>
-                    <span className="text-white">{project.progress}%</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-brand-600 rounded-full transition-all duration-500" 
-                      style={{ width: `${project.progress}%` }}
-                    />
-                  </div>
-                </div>
-                
-                <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                  <div className="flex items-center gap-1.5 text-xs text-zinc-500">
-                    <Clock className="w-3 h-3" />
-                    Actualizado hace {project.lastUpdate}
-                  </div>
-                  <div className="text-xs font-medium text-white">
-                    {project.evaluations} <span className="text-zinc-500">evals</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <CardHeader>
+                  <CardTitle className="text-lg group-hover:text-brand-400 transition-colors">
+                    {plantilla.nombre}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-2">
+                    {plantilla.descripcion}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link href={`/evaluacion/${plantilla.id}`}>
+                    <Button variant="secondary" className="w-full group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                      Comenzar Evaluación
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Bottom Section: Recent Activity / Announcements */}
+      {/* Activity Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Actividad Reciente</CardTitle>
-            <CardDescription>Eventos clave en tus proyectos.</CardDescription>
+            <CardTitle className="text-lg">Información del Sistema</CardTitle>
+            <CardDescription>Estado de la arquitectura backend y base de datos.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {[
-              { text: "Nueva evaluación completada en App Bancaria", time: "2h ago", type: "eval" },
-              { text: "Edison Ospina creó el proyecto E-commerce", time: "5h ago", type: "proj" },
-              { text: "Reporte mensual generado satisfactoriamente", time: "1d ago", type: "report" },
-            ].map((activity, i) => (
-              <div key={i} className="flex gap-4 items-start">
-                <div className="w-2 h-2 rounded-full mt-1.5 bg-brand-500" />
-                <div className="flex-1">
-                  <p className="text-sm text-zinc-200">{activity.text}</p>
-                  <p className="text-xs text-zinc-500 mt-1">{activity.time}</p>
+          <CardContent className="space-y-4">
+             <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                <div className="flex items-center gap-3">
+                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                   <span className="text-sm text-zinc-200">Backend FastAPI</span>
                 </div>
-              </div>
-            ))}
+                <span className="text-xs text-emerald-500 font-medium">ONLINE</span>
+             </div>
+             <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                <div className="flex items-center gap-3">
+                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                   <span className="text-sm text-zinc-200">Base de Datos PostgreSQL</span>
+                </div>
+                <span className="text-xs text-emerald-500 font-medium">CONECTADA</span>
+             </div>
           </CardContent>
         </Card>
         
         <Card className="bg-brand-600/5 border-brand-500/10">
           <CardHeader>
-             <CardTitle className="text-lg text-brand-400">Próximos Pasos</CardTitle>
-             <CardDescription>Recomendaciones heurísticas para ti.</CardDescription>
+             <CardTitle className="text-lg text-brand-400">Guía de Uso</CardTitle>
+             <CardDescription>Cómo empezar con la plataforma.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-             <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2">
-                <p className="text-sm font-medium text-white">Revisar heurísticas de Nielsen</p>
-                <p className="text-xs text-zinc-400">El proyecto Landing Page tiene 4 evaluaciones pendientes por categorizar.</p>
-                <Button variant="secondary" size="sm" className="mt-2">Empezar ahora</Button>
-             </div>
-             <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2">
-                <p className="text-sm font-medium text-white">Generar reporte de KPIs</p>
-                <p className="text-xs text-zinc-400">Has alcanzado el límite de 40 evaluaciones. Es un buen momento para exportar.</p>
-                <Button variant="outline" size="sm" className="mt-2">Generar PDF</Button>
-             </div>
+          <CardContent className="text-sm text-zinc-400 space-y-4">
+             <p>1. Selecciona una plantilla de la lista superior.</p>
+             <p>2. Completa los campos requeridos en el formulario dinámico.</p>
+             <p>3. El sistema procesará automáticamente los promedios por dimensión y generará alertas si detecta problemas críticos de usabilidad.</p>
           </CardContent>
         </Card>
       </div>

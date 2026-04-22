@@ -1,6 +1,11 @@
 from fastapi import APIRouter
+from .api import plantillas, evaluaciones, auth
 
 router = APIRouter()
+
+router.include_router(auth.router)
+router.include_router(plantillas.router)
+router.include_router(evaluaciones.router)
 
 @router.get("/")
 async def index():

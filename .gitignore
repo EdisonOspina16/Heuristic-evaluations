@@ -2,5 +2,14 @@
 .DS_Store
 Thumbs.db
 
+# Ignore all markdown files except README.MD
+*.md
+!README.MD
+**/*.md
+!**/README.MD
+
 # Temporarily ignore init-bd as requested
 init-bd/
+scratch/
+
+

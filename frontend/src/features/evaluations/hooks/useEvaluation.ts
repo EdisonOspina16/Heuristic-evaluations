@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { evaluationsService } from '../services/evaluations.service';
 import { PlantillaEstructura, EvaluacionCreate, RespuestaCreate } from '@/types/evaluations';
 
@@ -8,19 +8,15 @@ import { PlantillaEstructura, EvaluacionCreate, RespuestaCreate } from '@/types/
  * 
  * @param plantillaId - ID de la plantilla a cargar inicialmente
  */
-export const useEvaluation = (plantillaId?: number) => {
+export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
   const [plantilla, setPlantilla] = useState<PlantillaEstructura | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [respuestas, setRespuestas] = useState<Record<number, RespuestaCreate>>({});
+  const [draftEvaluationId, setDraftEvaluationId] = useState<number | undefined>(evaluationId);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
 
-  useEffect(() => {
-    if (plantillaId) {
-      loadPlantilla(plantillaId);
-    }
-  }, [plantillaId]);
-
-  const loadPlantilla = async (id: number) => {
+  const loadPlantilla = useCallback(async (id: number, existingEvaluationId?: number) => {
     setLoading(true);
     try {
       const data = await evaluationsService.getEstructura(id);
@@ -38,13 +34,29 @@ export const useEvaluation = (plantillaId?: number) => {
           };
         });
       });
+      if (existingEvaluationId) {
+        const progress = await evaluationsService.getProgress(existingEvaluationId);
+        progress.respuestas.forEach(resp => {
+          initialRespuestas[resp.pregunta_id] = {
+            ...initialRespuestas[resp.pregunta_id],
+            ...resp,
+          };
+        });
+        setDraftEvaluationId(progress.evaluation_id);
+      }
       setRespuestas(initialRespuestas);
     } catch (err: any) {
       setError(err.message || 'Error loading template');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (plantillaId) {
+      loadPlantilla(plantillaId, evaluationId);
+    }
+  }, [plantillaId, evaluationId, loadPlantilla]);
 
   const updateRespuesta = (preguntaId: number, data: Partial<RespuestaCreate>) => {
     setRespuestas(prev => ({
@@ -53,6 +65,20 @@ export const useEvaluation = (plantillaId?: number) => {
     }));
   };
 
+  const saveProgress = useCallback(async (projectId: number, userId: number) => {
+    if (!plantilla || !projectId || !userId) return;
+    const result = await evaluationsService.saveProgress({
+      evaluation_id: draftEvaluationId,
+      plantilla_id: plantilla.id,
+      proyecto_id: projectId,
+      evaluador_id: userId,
+      respuestas: Object.values(respuestas)
+    });
+    setDraftEvaluationId(result.id);
+    setLastSavedAt(new Date());
+    return result;
+  }, [draftEvaluationId, plantilla, respuestas]);
+
   const submit = async (projectId: number, userId: number, perfil?: string, estudios?: string) => {
     if (!plantilla) return;
     
@@ -60,6 +86,7 @@ export const useEvaluation = (plantillaId?: number) => {
       plantilla_id: plantilla.id,
       proyecto_id: projectId,
       evaluador_id: userId,
+      evaluation_id: draftEvaluationId,
       perfil,
       estudios,
       respuestas: Object.values(respuestas)
@@ -82,7 +109,10 @@ export const useEvaluation = (plantillaId?: number) => {
     loading,
     error,
     respuestas,
+    draftEvaluationId,
+    lastSavedAt,
     updateRespuesta,
+    saveProgress,
     submit
   };
 };

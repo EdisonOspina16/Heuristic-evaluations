@@ -40,10 +40,23 @@ export interface RespuestaCreate {
 }
 
 export interface EvaluacionCreate {
+  evaluation_id?: number;
   plantilla_id: number;
   proyecto_id: number;
   evaluador_id: number;
   perfil?: string;
   estudios?: string;
+  respuestas: RespuestaCreate[];
+}
+
+export interface EvaluationProgress {
+  evaluation_id: number;
+  plantilla_id: number;
+  proyecto_id: number;
+  evaluador_id: number;
+  estado: string;
+  progress_percentage: number;
+  answered_count: number;
+  total_questions: number;
   respuestas: RespuestaCreate[];
 }

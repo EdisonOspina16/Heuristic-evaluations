@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from ...infrastructure.repositories.evaluacion_repository import EvaluacionRepository
 from ...infrastructure.models import ResultadoDimension, Respuesta, Pregunta, OpcionCategorica
-from ...domain.schemas import EvaluacionCreate
+from ...domain.schemas import EvaluacionCreate, ProgressSave
 from decimal import Decimal
 
 class EvaluacionService:
@@ -26,6 +26,37 @@ class EvaluacionService:
         self.calcular_resultados(db_eval.id)
 
         return db_eval
+
+    def get_evaluaciones_proyecto(self, project_id: int):
+        return self.repository.get_by_project(project_id)
+
+    def guardar_progreso(self, progress_data: ProgressSave):
+        return self.repository.save_draft(progress_data)
+
+    def get_progreso(self, evaluation_id: int):
+        evaluacion = self.repository.get_by_id(evaluation_id)
+        if not evaluacion:
+            return None
+        return {
+            "evaluation_id": evaluacion.id,
+            "plantilla_id": evaluacion.plantilla_id,
+            "proyecto_id": evaluacion.proyecto_id,
+            "evaluador_id": evaluacion.evaluador_id,
+            "estado": evaluacion.estado,
+            "progress_percentage": evaluacion.progress_percentage,
+            "answered_count": evaluacion.answered_count,
+            "total_questions": evaluacion.total_questions,
+            "respuestas": [
+                {
+                    "pregunta_id": respuesta.pregunta_id,
+                    "valor_numerico": respuesta.valor_numerico,
+                    "opcion_id": respuesta.opcion_id,
+                    "comentario": respuesta.comentario,
+                }
+                for respuesta in evaluacion.respuestas
+            ],
+            "updated_at": evaluacion.created_at,
+        }
 
     def calcular_resultados(self, evaluacion_id: int):
         """

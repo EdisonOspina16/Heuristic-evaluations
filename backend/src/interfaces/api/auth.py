@@ -11,15 +11,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 def register(user_data: UsuarioCreate, db: Session = Depends(get_db)):
     """
     Registra un nuevo usuario en la plataforma.
-    Valida que el correo no esté registrado previamente.
+    El primer usuario recibe automáticamente el rol ADMIN.
     """
     repo = UsuarioRepository(db)
     existing_user = repo.get_by_email(user_data.email)
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
-    if user_data.rol not in ['admin', 'evaluador']:
-        user_data.rol = 'evaluador'
         
     return repo.create(user_data)
 
@@ -31,13 +28,33 @@ def login(user_data: UsuarioLogin, db: Session = Depends(get_db)):
     """
     repo = UsuarioRepository(db)
     user = repo.get_by_email(user_data.email)
-    if not user or not verify_password(user_data.password, user.password_hash):
+    
+    if not user or not user.active or not verify_password(user_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect email or password, or account inactive",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token = create_access_token(data={"sub": user.email, "id": user.id, "rol": user.rol})
+    
+    # Get all permissions (role + direct)
+    permissions = set()
+    for role in user.roles:
+        for perm in role.permissions:
+            permissions.add(perm.code)
+    for perm in user.direct_permissions:
+        permissions.add(perm.code)
+    
+    # Get primary role name
+    role_name = user.roles[0].name if user.roles else "EVALUADOR"
+    
+    # Create token with roles/permissions info
+    access_token = create_access_token(data={
+        "sub": user.email, 
+        "id": user.id, 
+        "rol": role_name,
+        "permissions": list(permissions)
+    })
+    
     return {
         "access_token": access_token, 
         "token_type": "bearer", 
@@ -45,6 +62,16 @@ def login(user_data: UsuarioLogin, db: Session = Depends(get_db)):
             "id": user.id, 
             "nombre": user.nombre, 
             "email": user.email, 
-            "rol": user.rol
+            "rol": role_name,
+            "active": user.active,
+            "permissions": list(permissions)
         }
     }
+
+@router.post("/logout")
+def logout():
+    """
+    Endpoint para logout. En una implementación JWT básica, 
+    el cliente simplemente debe eliminar el token localmente.
+    """
+    return {"message": "Logged out successfully"}

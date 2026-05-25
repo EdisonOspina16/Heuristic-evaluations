@@ -5,17 +5,37 @@ from decimal import Decimal
 
 """
 Esquemas Pydantic utilizados para validar el payload de entrada y serializar
-la salida en la API. Define estructuras para autenticación, plantillas y evaluaciones.
+la salida en la API. Define estructuras para autenticación, proyectos, plantillas y evaluaciones.
 """
+
+# --- RBAC ---
+class PermissionResponse(BaseModel):
+    id: int
+    code: str
+    name: str
+    description: Optional[str] = None
+    class Config:
+        from_attributes = True
+
+class RoleResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    permissions: List[PermissionResponse] = []
+    class Config:
+        from_attributes = True
 
 # --- USUARIO ---
 class UsuarioBase(BaseModel):
     nombre: str
     email: EmailStr
-    rol: str
+    active: bool = True
 
 class UsuarioCreate(UsuarioBase):
+    nombre: str
+    email: EmailStr
     password: str
+    # rol is assigned by repository logic or by an admin
 
 class UsuarioLogin(BaseModel):
     email: EmailStr
@@ -24,6 +44,8 @@ class UsuarioLogin(BaseModel):
 class UsuarioResponse(UsuarioBase):
     id: int
     created_at: datetime
+    roles: List[RoleResponse] = []
+    direct_permissions: List[PermissionResponse] = []
     class Config:
         from_attributes = True
 
@@ -34,12 +56,13 @@ class ProyectoBase(BaseModel):
     cliente: Optional[str] = None
 
 class ProyectoCreate(ProyectoBase):
-    pass
+    evaluadores_ids: List[int] = []
 
 class ProyectoResponse(ProyectoBase):
     id: int
     creado_por: Optional[int]
     created_at: datetime
+    evaluadores: List[UsuarioResponse] = []
     class Config:
         from_attributes = True
 
@@ -93,12 +116,63 @@ class RespuestaCreate(BaseModel):
     comentario: Optional[str] = None
 
 class EvaluacionCreate(BaseModel):
+    evaluation_id: Optional[int] = None
     plantilla_id: int
     proyecto_id: int
     evaluador_id: int
     perfil: Optional[str] = None
     estudios: Optional[str] = None
     respuestas: List[RespuestaCreate]
+
+# --- ASSIGNMENT (ADMIN) ---
+class AssignmentCreate(BaseModel):
+    evaluator_id: int
+    project_id: int
+    allowed_evaluation_types: Optional[List[str]] = None  # e.g., ["UI", "UX"]
+    role: Optional[str] = "Evaluator"
+
+class AssignmentResponse(BaseModel):
+    id: int
+    evaluator_id: int
+    project_id: int
+    allowed_evaluation_types: Optional[List[str]] = None
+    role: str
+    class Config:
+        from_attributes = True
+
+# --- PROGRESS (EVALUATION) ---
+class ProgressSave(BaseModel):
+    evaluation_id: Optional[int] = None
+    plantilla_id: int
+    proyecto_id: int
+    evaluador_id: int
+    respuestas: List[RespuestaCreate] = []
+    heuristic_id: Optional[int] = None
+    saved_state: Optional[Any] = None
+    status: Optional[str] = "incomplete"
+
+class ProgressResponse(BaseModel):
+    evaluation_id: int
+    plantilla_id: int
+    proyecto_id: int
+    evaluador_id: int
+    estado: str
+    progress_percentage: int = 0
+    answered_count: int = 0
+    total_questions: int = 0
+    respuestas: List[RespuestaCreate] = []
+    updated_at: Optional[datetime] = None
+    class Config:
+        from_attributes = True
+
+class ProgressEntryResponse(BaseModel):
+    id: int
+    evaluation_id: int
+    heuristic_id: int
+    saved_state: Optional[Any] = None
+    status: str
+    class Config:
+        from_attributes = True
 
 class EvaluacionResponse(BaseModel):
     id: int
@@ -108,6 +182,13 @@ class EvaluacionResponse(BaseModel):
     estado: str
     fecha: date
     created_at: datetime
+    plantilla_nombre: Optional[str] = None
+    evaluador_nombre: Optional[str] = None
+    perfil: Optional[str] = None
+    estudios: Optional[str] = None
+    progress_percentage: int = 0
+    answered_count: int = 0
+    total_questions: int = 0
     class Config:
         from_attributes = True
 

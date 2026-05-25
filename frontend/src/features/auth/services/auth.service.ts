@@ -7,6 +7,7 @@ export interface User {
   nombre: string;
   email: string;
   rol: string;
+  permissions?: string[];
 }
 
 export interface AuthResponse {
@@ -68,5 +69,13 @@ export const authService = {
       return localStorage.getItem('token');
     }
     return null;
+  },
+
+  can(permission: string): boolean {
+    const user = this.getCurrentUser();
+    if (!user) return false;
+    // Admin bypass: if rol is ADMIN, they can do everything
+    if (user.rol === 'ADMIN') return true;
+    return user.permissions?.includes(permission) || false;
   }
 };

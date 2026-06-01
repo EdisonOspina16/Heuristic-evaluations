@@ -1,22 +1,22 @@
 -- ==========================================
 -- 1. EXTENSIONES Y LIMPIEZA
 -- ==========================================
--- DROP TABLE IF EXISTS resultados_dimensiones CASCADE;
--- DROP TABLE IF EXISTS respuestas CASCADE;
--- DROP TABLE IF EXISTS evaluaciones CASCADE;
--- DROP TABLE IF EXISTS preguntas_opciones CASCADE;
--- DROP TABLE IF EXISTS opciones_categoricas CASCADE;
--- DROP TABLE IF EXISTS preguntas CASCADE;
--- DROP TABLE IF EXISTS dimensiones CASCADE;
--- DROP TABLE IF EXISTS plantillas CASCADE;
--- DROP TABLE IF EXISTS proyectos_usuarios CASCADE;
--- DROP TABLE IF EXISTS proyectos CASCADE;
--- DROP TABLE IF EXISTS user_permissions CASCADE;
--- DROP TABLE IF EXISTS role_permissions CASCADE;
--- DROP TABLE IF EXISTS user_roles CASCADE;
--- DROP TABLE IF EXISTS permissions CASCADE;
--- DROP TABLE IF EXISTS roles CASCADE;
--- DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS resultados_dimensiones CASCADE;
+DROP TABLE IF EXISTS respuestas CASCADE;
+DROP TABLE IF EXISTS evaluaciones CASCADE;
+DROP TABLE IF EXISTS preguntas_opciones CASCADE;
+DROP TABLE IF EXISTS opciones_categoricas CASCADE;
+DROP TABLE IF EXISTS preguntas CASCADE;
+DROP TABLE IF EXISTS dimensiones CASCADE;
+DROP TABLE IF EXISTS plantillas CASCADE;
+DROP TABLE IF EXISTS proyectos_usuarios CASCADE;
+DROP TABLE IF EXISTS proyectos CASCADE;
+DROP TABLE IF EXISTS user_permissions CASCADE;
+DROP TABLE IF EXISTS role_permissions CASCADE;
+DROP TABLE IF EXISTS user_roles CASCADE;
+DROP TABLE IF EXISTS permissions CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
 -- ==========================================
 -- 2. RBAC (Roles y Permisos)

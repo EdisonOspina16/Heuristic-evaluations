@@ -60,7 +60,22 @@ class EvaluacionRepository:
         self.db.refresh(db_eval)
         return db_eval
 
-    def save_draft(self, progress_data):
+    def save_draft(self, progress_data, _retry=False):
+        """
+        Guarda el progreso parcial de una evaluación.
+        Maneja concurrencia de auto-save: si ocurre un UniqueViolation
+        por race condition, hace rollback y reintenta una vez.
+        """
+        try:
+            return self._save_draft_impl(progress_data)
+        except Exception as e:
+            self.db.rollback()
+            # Retry once on IntegrityError (race condition between concurrent auto-saves)
+            if not _retry and ("UniqueViolation" in str(type(e).__mro__) or "unique" in str(e).lower()):
+                return self.save_draft(progress_data, _retry=True)
+            raise
+
+    def _save_draft_impl(self, progress_data):
         db_eval = self.get_by_id(progress_data.evaluation_id) if progress_data.evaluation_id else None
         if not db_eval:
             db_eval = (
@@ -84,15 +99,16 @@ class EvaluacionRepository:
             self.db.add(db_eval)
             self.db.flush()
 
+        # Load ALL existing respuestas for this evaluation in one query
+        existing_respuestas = (
+            self.db.query(Respuesta)
+            .filter(Respuesta.evaluacion_id == db_eval.id)
+            .all()
+        )
+        existing_map = {r.pregunta_id: r for r in existing_respuestas}
+
         for resp in progress_data.respuestas:
-            existing = (
-                self.db.query(Respuesta)
-                .filter(
-                    Respuesta.evaluacion_id == db_eval.id,
-                    Respuesta.pregunta_id == resp.pregunta_id,
-                )
-                .first()
-            )
+            existing = existing_map.get(resp.pregunta_id)
             has_content = resp.valor_numerico is not None or resp.opcion_id is not None or bool((resp.comentario or "").strip())
             if existing:
                 if has_content:

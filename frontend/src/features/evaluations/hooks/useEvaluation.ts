@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { evaluationsService } from '../services/evaluations.service';
 import { PlantillaEstructura, EvaluacionCreate, RespuestaCreate } from '@/types/evaluations';
 
@@ -15,6 +15,20 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
   const [respuestas, setRespuestas] = useState<Record<number, RespuestaCreate>>({});
   const [draftEvaluationId, setDraftEvaluationId] = useState<number | undefined>(evaluationId);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+
+  // Refs to avoid stale closures in async callbacks
+  const respuestasRef = useRef(respuestas);
+  const draftEvaluationIdRef = useRef(draftEvaluationId);
+  const isSavingRef = useRef(false);
+  const pendingSaveRef = useRef<{ projectId: number; userId: number } | null>(null);
+
+  useEffect(() => {
+    respuestasRef.current = respuestas;
+  }, [respuestas]);
+
+  useEffect(() => {
+    draftEvaluationIdRef.current = draftEvaluationId;
+  }, [draftEvaluationId]);
 
   const loadPlantilla = useCallback(async (id: number, existingEvaluationId?: number) => {
     setLoading(true);
@@ -40,6 +54,9 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
           initialRespuestas[resp.pregunta_id] = {
             ...initialRespuestas[resp.pregunta_id],
             ...resp,
+            valor_numerico: resp.valor_numerico !== undefined && resp.valor_numerico !== null
+              ? Number(resp.valor_numerico)
+              : undefined,
           };
         });
         setDraftEvaluationId(progress.evaluation_id);
@@ -65,19 +82,42 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
     }));
   };
 
-  const saveProgress = useCallback(async (projectId: number, userId: number) => {
+  const saveProgress = useCallback(async (projectId: number, userId: number): Promise<any> => {
     if (!plantilla || !projectId || !userId) return;
-    const result = await evaluationsService.saveProgress({
-      evaluation_id: draftEvaluationId,
-      plantilla_id: plantilla.id,
-      proyecto_id: projectId,
-      evaluador_id: userId,
-      respuestas: Object.values(respuestas)
-    });
-    setDraftEvaluationId(result.id);
-    setLastSavedAt(new Date());
-    return result;
-  }, [draftEvaluationId, plantilla, respuestas]);
+
+    // If currently saving, queue this save and return
+    if (isSavingRef.current) {
+      pendingSaveRef.current = { projectId, userId };
+      return;
+    }
+
+    isSavingRef.current = true;
+    try {
+      const result = await evaluationsService.saveProgress({
+        evaluation_id: draftEvaluationIdRef.current,
+        plantilla_id: plantilla.id,
+        proyecto_id: projectId,
+        evaluador_id: userId,
+        respuestas: Object.values(respuestasRef.current)
+      });
+      
+      setDraftEvaluationId(result.id);
+      draftEvaluationIdRef.current = result.id;
+      setLastSavedAt(new Date());
+
+      // If a save was queued while we were active, run it now
+      if (pendingSaveRef.current) {
+        const queued = pendingSaveRef.current;
+        pendingSaveRef.current = null;
+        isSavingRef.current = false;
+        return saveProgress(queued.projectId, queued.userId);
+      }
+
+      return result;
+    } finally {
+      isSavingRef.current = false;
+    }
+  }, [plantilla]);
 
   const submit = async (projectId: number, userId: number, perfil?: string, estudios?: string) => {
     if (!plantilla) return;
@@ -86,10 +126,10 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
       plantilla_id: plantilla.id,
       proyecto_id: projectId,
       evaluador_id: userId,
-      evaluation_id: draftEvaluationId,
+      evaluation_id: draftEvaluationIdRef.current,
       perfil,
       estudios,
-      respuestas: Object.values(respuestas)
+      respuestas: Object.values(respuestasRef.current)
     };
 
     setLoading(true);

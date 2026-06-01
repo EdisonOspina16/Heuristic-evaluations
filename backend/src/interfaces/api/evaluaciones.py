@@ -4,6 +4,10 @@ from ...infrastructure.database import get_db
 from ...application.services.evaluacion_service import EvaluacionService
 from ...domain.schemas import EvaluacionCreate, EvaluacionResponse, ProgressSave, ProgressResponse
 from typing import List
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/evaluaciones", tags=["evaluaciones"])
 
@@ -17,6 +21,8 @@ def create_evaluacion(eval_data: EvaluacionCreate, db: Session = Depends(get_db)
     try:
         return service.registrar_evaluacion(eval_data)
     except Exception as e:
+        logger.error("Error creating evaluacion: %s", str(e))
+        traceback.print_exc()
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/proyecto/{project_id}", response_model=List[EvaluacionResponse])
@@ -28,8 +34,16 @@ def get_evaluaciones_proyecto(project_id: int, db: Session = Depends(get_db)):
 def save_progress(progress_data: ProgressSave, db: Session = Depends(get_db)):
     service = EvaluacionService(db)
     try:
-        return service.guardar_progreso(progress_data)
+        logger.info("Saving progress - evaluation_id: %s, plantilla_id: %s, proyecto_id: %s, evaluador_id: %s, num_respuestas: %d",
+                     progress_data.evaluation_id, progress_data.plantilla_id,
+                     progress_data.proyecto_id, progress_data.evaluador_id,
+                     len(progress_data.respuestas))
+        result = service.guardar_progreso(progress_data)
+        logger.info("Progress saved OK - evaluation id: %s", result.id)
+        return result
     except Exception as e:
+        logger.error("Error saving progress: %s", str(e))
+        traceback.print_exc()
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/progress/{evaluation_id}", response_model=ProgressResponse)

@@ -48,14 +48,16 @@ pipeline {
         }
 
         stage('Backend Tests') {
-            when{
-                expression {params.RUN_UNIT_TESTS_BACKEND}
-            }
             steps {
                 dir('backend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-                        sh 'pip3 install -r requirements.txt'
-                        sh 'pytest'
+                        sh '''
+                            python3 -m venv venv
+                            . venv/bin/activate
+                            pip install --upgrade pip
+                            pip install -r requirements.txt
+                            pytest
+                        '''
                     }
                 }
             }

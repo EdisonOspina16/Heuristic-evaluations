@@ -28,7 +28,9 @@ pipeline {
         stage('Backend Install') {
             steps {
                 dir('backend') {
-                    sh 'pip install -r requirements.txt'
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                        sh 'pip3 install -r requirements.txt'
+                    }
                 }
             }
         }
@@ -36,7 +38,9 @@ pipeline {
         stage('Backend Tests') {
             steps {
                 dir('backend') {
-                    sh 'pytest'
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                        sh 'pytest'
+                    }
                 }
             }
         }

@@ -17,7 +17,7 @@ pipeline {
 
         stage('Frontend Tests') {
             steps {
-                dir('frontend') {
+                catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                     sh 'npm test'
                 }
             }

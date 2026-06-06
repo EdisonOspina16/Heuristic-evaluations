@@ -19,14 +19,14 @@ pipeline {
             }
             steps {
                 script {
-                    dir('Backend') {
+                    dir('backend') {
                         withSonarQubeEnv('SonarQube') {
-                            runCommand('npx sonar-scanner')
+                            sh 'npx sonar-scanner'
                         }
                     }
-                    dir('Frontend') {
+                    dir('frontend') {
                         withSonarQubeEnv('SonarQube') {
-                            runCommand('npx sonar-scanner')
+                            sh 'npx sonar-scanner'
                         }
                     }
                 }

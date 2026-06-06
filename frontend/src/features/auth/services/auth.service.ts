@@ -28,6 +28,7 @@ export const authService = {
     const response = await axios.post(`${API_URL}/auth/login`, { email, password });
     if (response.data.access_token) {
       if (typeof window !== 'undefined') {
+        localStorage.setItem('access_token', response.data.access_token);
         localStorage.setItem('token', response.data.access_token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
@@ -45,8 +46,7 @@ export const authService = {
   
   logout(): void {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      localStorage.clear();
     }
   },
   
@@ -57,6 +57,7 @@ export const authService = {
         try {
           return JSON.parse(userStr);
         } catch (e) {
+          console.error('Failed to parse user from localStorage:', e);
           return null;
         }
       }
@@ -66,7 +67,7 @@ export const authService = {
   
   getToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
+      return localStorage.getItem('access_token') || localStorage.getItem('token');
     }
     return null;
   },

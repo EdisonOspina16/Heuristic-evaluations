@@ -6,3 +6,5 @@ python-dotenv
 passlib[bcrypt]
 PyJWT
 pydantic[email]
+pytest
+pytest-cov

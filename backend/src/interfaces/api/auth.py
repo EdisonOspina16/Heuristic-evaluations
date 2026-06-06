@@ -29,10 +29,17 @@ def login(user_data: UsuarioLogin, db: Session = Depends(get_db)):
     repo = UsuarioRepository(db)
     user = repo.get_by_email(user_data.email)
     
-    if not user or not user.active or not verify_password(user_data.password, user.password_hash):
+    if not user or not verify_password(user_data.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password, or account inactive",
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if not user.active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User account is inactive",
             headers={"WWW-Authenticate": "Bearer"},
         )
     

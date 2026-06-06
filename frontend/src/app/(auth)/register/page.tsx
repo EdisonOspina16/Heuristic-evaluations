@@ -83,6 +83,7 @@ export default function RegisterPage() {
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-100 dark:bg-gray-800 rounded-full" />
               <motion.div 
                 className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-blue-500 rounded-full"
+                data-testid="registration-progress"
                 initial={{ width: "0%" }}
                 animate={{ width: `${((step - 1) / 2) * 100}%` }}
                 transition={{ duration: 0.4 }}
@@ -113,6 +114,7 @@ export default function RegisterPage() {
               {/* Step 1: Name */}
               {step === 1 && (
                 <motion.div
+                  data-testid="register-step-1"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -150,6 +152,7 @@ export default function RegisterPage() {
               {/* Step 2: Email */}
               {step === 2 && (
                 <motion.div
+                  data-testid="register-step-2"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
@@ -196,6 +199,7 @@ export default function RegisterPage() {
               {/* Step 3: Password */}
               {step === 3 && (
                 <motion.div
+                  data-testid="register-step-3"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}

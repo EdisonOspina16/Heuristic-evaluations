@@ -1,18 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { 
-  ShieldCheck, 
-  Shield, 
-  Loader2, 
-  Info
-} from "lucide-react";
+import { ShieldCheck, Shield, Loader2, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import axios from "axios";
 import { authService } from "@/features/auth/services/auth.service";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export default function RolesManagementPage() {
   const [roles, setRoles] = useState<any[]>([]);
@@ -20,13 +12,20 @@ export default function RolesManagementPage() {
 
   const fetchRoles = async () => {
     try {
-      const token = authService.getToken();
-      // Use the existing users endpoint if roles endpoint doesn't exist yet, 
-      // but let's assume we have a list roles endpoint or we create one.
-      // For now, let's just show the static roles defined in the system.
+      authService.getToken();
       setRoles([
-        { id: 1, name: "ADMIN", description: "Control total del sistema, gestión de usuarios y configuraciones.", permissions_count: 11 },
-        { id: 2, name: "EVALUADOR", description: "Acceso a realizar evaluaciones y consultar reportes asignados.", permissions_count: 3 }
+        {
+          id: 1,
+          name: "ADMIN",
+          description: "Control total del sistema, gestion de usuarios y configuraciones.",
+          permissions_count: 11,
+        },
+        {
+          id: 2,
+          name: "EVALUADOR",
+          description: "Acceso a realizar evaluaciones y consultar reportes asignados.",
+          permissions_count: 3,
+        },
       ]);
     } catch (error) {
       console.error("Error fetching roles", error);
@@ -57,13 +56,20 @@ export default function RolesManagementPage() {
             <Loader2 className="w-10 h-10 animate-spin text-brand-400 mx-auto" />
           </div>
         ) : (
-          roles.map(role => (
-            <Card key={role.id} className="bg-zinc-900/50 border-white/5 backdrop-blur-xl rounded-3xl overflow-hidden hover:border-brand-500/20 transition-all group">
+          roles.map((role) => (
+            <Card
+              key={role.id}
+              className="bg-zinc-900/50 border-white/5 backdrop-blur-xl rounded-3xl overflow-hidden hover:border-brand-500/20 transition-all group"
+            >
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center border border-white/10 ${
-                    role.name === "ADMIN" ? "bg-amber-500/10 text-amber-400" : "bg-brand-500/10 text-brand-400"
-                  }`}>
+                  <div
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center border border-white/10 ${
+                      role.name === "ADMIN"
+                        ? "bg-amber-500/10 text-amber-400"
+                        : "bg-brand-500/10 text-brand-400"
+                    }`}
+                  >
                     <Shield className="w-5 h-5" />
                   </div>
                   <CardTitle className="text-xl font-bold">{role.name}</CardTitle>

@@ -7,25 +7,35 @@ pipeline {
 
     stages {
 
-        // stage('Checkout') {
-        //     steps {
-        //         git branch: 'main',
-        //             url: 'https://github.com/usuario/repositorio.git'
-        //     }
-        // }
-
-        // stage('Backend Tests') {
-        //     steps {
-        //         dir('backend') {
-        //             sh 'pytest'
-        //         }
-        //     }
-        // }
+        stage('Frontend Install') {
+            steps {
+                dir('frontend') {
+                    sh 'npm install'
+                }
+            }
+        }
 
         stage('Frontend Tests') {
             steps {
-                sh 'npm ci'
-                sh 'npm test'
+                dir('frontend') {
+                    sh 'npm test'
+                }
+            }
+        }
+
+        stage('Backend Install') {
+            steps {
+                dir('backend') {
+                    sh 'pip install -r requirements.txt'
+                }
+            }
+        }
+
+        stage('Backend Tests') {
+            steps {
+                dir('backend') {
+                    sh 'pytest'
+                }
             }
         }
     }

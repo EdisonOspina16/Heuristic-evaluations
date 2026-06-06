@@ -1,44 +1,60 @@
 pipeline {
     agent any
 
+    parameters {
+        booleanParam(name: 'RUN_UNIT_TESTS_FRONTEND',   defaultValue: true, description: 'Ejecutar unit tests de Frontend')
+        booleanParam(name: 'RUN_UNIT_TESTS_BACKEND',        defaultValue: true, description: 'Ejecutar unit tests de Backend')
+        booleanParam(name: 'RUN_SONAR',        defaultValue: true, description: 'Ejecutar analisis SonarQube')
+    }
+
     tools {
         nodejs 'NodeJS-22'
     }
 
     stages {
 
-        stage('Frontend Install') {
+        stage('SonarQube') {
+            when{
+                expression {params.RUN_SONAR}
+            }
             steps {
-                dir('frontend') {
-                    sh 'npm install'
+                script {
+                    dir('Backend') {
+                        withSonarQubeEnv('SonarQube') {
+                            runCommand('npx sonar-scanner')
+                        }
+                    }
+                    dir('Frontend') {
+                        withSonarQubeEnv('SonarQube') {
+                            runCommand('npx sonar-scanner')
+                        }
+                    }
                 }
             }
         }
 
         stage('Frontend Tests') {
+            when{
+                expression {params.RUN_UNIT_TESTS_FRONTEND}
+            }
             steps {
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                        sh 'npm install'
                         sh 'npm test'
                     }
                 }
             }
         }
 
-        stage('Backend Install') {
+        stage('Backend Tests') {
+            when{
+                expression {params.RUN_UNIT_TESTS_BACKEND}
+            }
             steps {
                 dir('backend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                         sh 'pip3 install -r requirements.txt'
-                    }
-                }
-            }
-        }
-
-        stage('Backend Tests') {
-            steps {
-                dir('backend') {
-                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                         sh 'pytest'
                     }
                 }

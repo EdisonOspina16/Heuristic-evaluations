@@ -1,0 +1,6 @@
+projectKey=Heuristic-Evaluations-Backend
+serverUrl=http://localhost:9000
+serverVersion=26.3.0.120487
+dashboardUrl=http://localhost:9000/dashboard?id=Heuristic-Evaluations-Backend
+ceTaskId=12814aa2-fe2a-411f-99f6-24eeaf0980d7
+ceTaskUrl=http://localhost:9000/api/ce/task?id=12814aa2-fe2a-411f-99f6-24eeaf0980d7

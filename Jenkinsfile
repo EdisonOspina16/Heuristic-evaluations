@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     parameters {
+        booleanParam(name: 'RUN_SONAR',        defaultValue: true, description: 'Ejecutar analisis SonarQube')
         booleanParam(name: 'RUN_UNIT_TESTS_FRONTEND',   defaultValue: true, description: 'Ejecutar unit tests de Frontend')
         booleanParam(name: 'RUN_UNIT_TESTS_BACKEND',        defaultValue: true, description: 'Ejecutar unit tests de Backend')
-        booleanParam(name: 'RUN_SONAR',        defaultValue: true, description: 'Ejecutar analisis SonarQube')
     }
 
     tools {

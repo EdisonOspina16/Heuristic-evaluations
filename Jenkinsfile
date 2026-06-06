@@ -1,10 +1,15 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'stephano21/jenkins-ci:latest'
+            args '-u root'
+        }
+    }
 
     parameters {
-        booleanParam(name: 'RUN_SONAR',        defaultValue: true, description: 'Ejecutar analisis SonarQube')
-        booleanParam(name: 'RUN_UNIT_TESTS_FRONTEND',   defaultValue: true, description: 'Ejecutar unit tests de Frontend')
-        booleanParam(name: 'RUN_UNIT_TESTS_BACKEND',        defaultValue: true, description: 'Ejecutar unit tests de Backend')
+        booleanParam(name: 'RUN_SONAR', defaultValue: true, description: 'Ejecutar analisis SonarQube')
+        booleanParam(name: 'RUN_UNIT_TESTS_FRONTEND', defaultValue: true, description: 'Frontend tests')
+        booleanParam(name: 'RUN_UNIT_TESTS_BACKEND', defaultValue: true, description: 'Backend tests')
     }
 
     tools {
@@ -14,9 +19,8 @@ pipeline {
     stages {
 
         stage('SonarQube') {
-            when{
-                expression {params.RUN_SONAR}
-            }
+            when { expression { params.RUN_SONAR } }
+
             steps {
                 script {
                     dir('backend') {
@@ -24,6 +28,7 @@ pipeline {
                             sh 'npx sonar-scanner'
                         }
                     }
+
                     dir('frontend') {
                         withSonarQubeEnv('SonarQube') {
                             sh 'npx sonar-scanner'
@@ -34,9 +39,8 @@ pipeline {
         }
 
         stage('Frontend Tests') {
-            when{
-                expression {params.RUN_UNIT_TESTS_FRONTEND}
-            }
+            when { expression { params.RUN_UNIT_TESTS_FRONTEND } }
+
             steps {
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
@@ -48,6 +52,8 @@ pipeline {
         }
 
         stage('Backend Tests') {
+            when { expression { params.RUN_UNIT_TESTS_BACKEND } }
+
             steps {
                 dir('backend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {

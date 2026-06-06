@@ -1,0 +1,6 @@
+projectKey=back-heuristicas
+serverUrl=http://localhost:9000
+serverVersion=26.3.0.120487
+dashboardUrl=http://localhost:9000/dashboard?id=back-heuristicas
+ceTaskId=f5a1fc08-b904-4f70-a457-a5f7439358bf
+ceTaskUrl=http://localhost:9000/api/ce/task?id=f5a1fc08-b904-4f70-a457-a5f7439358bf

@@ -40,15 +40,15 @@ jest.mock("next/image", () => {
 });
 
 jest.mock("framer-motion", () => {
-    const createMotionComponent = (tag: keyof JSX.IntrinsicElements) =>
-        React.forwardRef<
-            HTMLElement,
-            React.HTMLAttributes<HTMLElement> & { animate?: Record<string, unknown>; initial?: unknown; transition?: unknown }
-        >(({ animate, style, children, ...props }, ref) => {
-            const animatedStyle =
-                animate && typeof animate === "object"
-                    ? { ...(style || {}), ...animate }
-                    : style;
+  const createMotionComponent = (tag: keyof JSX.IntrinsicElements) =>
+    React.forwardRef<
+      HTMLElement,
+      React.HTMLAttributes<HTMLElement> & { animate?: Record<string, unknown>; initial?: unknown; transition?: unknown; exit?: unknown }
+    >(({ animate, style, children, initial, transition, exit, ...props }, ref) => {
+      const animatedStyle =
+        animate && typeof animate === "object"
+          ? { ...(style || {}), ...animate }
+          : style;
 
             return React.createElement(tag, { ref, style: animatedStyle, ...props }, children);
         });

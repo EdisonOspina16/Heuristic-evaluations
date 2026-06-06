@@ -35,7 +35,7 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
     try {
       const data = await evaluationsService.getEstructura(id);
       setPlantilla(data);
-      
+
       // Initialize answers
       const initialRespuestas: Record<number, RespuestaCreate> = {};
       data.dimensiones.forEach(dim => {
@@ -63,7 +63,7 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
       }
       setRespuestas(initialRespuestas);
     } catch (err: any) {
-      setError(err.message || 'Error loading template');
+      setError(err?.message || 'Error loading template');
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
         evaluador_id: userId,
         respuestas: Object.values(respuestasRef.current)
       });
-      
+
       setDraftEvaluationId(result.id);
       draftEvaluationIdRef.current = result.id;
       setLastSavedAt(new Date());
@@ -121,7 +121,7 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
 
   const submit = async (projectId: number, userId: number, perfil?: string, estudios?: string) => {
     if (!plantilla) return;
-    
+
     const payload: EvaluacionCreate = {
       plantilla_id: plantilla.id,
       proyecto_id: projectId,

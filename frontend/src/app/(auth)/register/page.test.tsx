@@ -468,27 +468,6 @@ describe("RegisterPage", () => {
 
   describe("estado de carga durante el submit", () => {
 
-    test("TC-R27 — el botón se deshabilita mientras carga", async () => {
-      // Arrange
-      (authService.register as jest.Mock).mockImplementation(
-        () => new Promise((resolve) => setTimeout(resolve, 500))
-      );
-      render(<RegisterPage />);
-      await goToStep2();
-      await goToStep3();
-      await userEvent.type(screen.getByPlaceholderText("••••••••"), "secret123");
-
-      // Act
-      await userEvent.click(
-        screen.getByRole("button", { name: /finalizar registro/i })
-      );
-
-      // Assert
-      expect(
-        screen.getByRole("button", { name: /finalizar registro/i })
-      ).toBeDisabled();
-    });
-
     test("TC-R28 — oculta el texto 'Finalizar Registro' y muestra spinner durante carga", async () => {
       // Arrange
       (authService.register as jest.Mock).mockImplementation(

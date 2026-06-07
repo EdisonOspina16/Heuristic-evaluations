@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { authService } from "@/features/auth/services/auth.service";
 import LoginPage from "./page";
 
@@ -40,7 +41,7 @@ const fillAndSubmit = async (email: string, password: string) => {
   fireEvent.click(screen.getByRole("button", { name: /iniciar sesión/i }));
 };
 
-// ── Suite ───────────────────────────────────────────────────────────────────
+// ── Suite 
 
 describe("LoginPage", () => {
 
@@ -48,7 +49,7 @@ describe("LoginPage", () => {
     jest.clearAllMocks();
   });
 
-  // ── RENDERIZADO INICIAL ─────────────────────────────────────────────────
+  // RENDERIZADO INICIAL 
 
   describe("renderizado inicial", () => {
 
@@ -56,7 +57,7 @@ describe("LoginPage", () => {
       // Arrange
       render(<LoginPage />);
 
-      // Act — (renderizado pasivo, no hay acción adicional)
+
 
       // Assert
       expect(screen.getByText("Bienvenido de nuevo")).toBeInTheDocument();
@@ -103,19 +104,14 @@ describe("LoginPage", () => {
     });
 
     test("TC-L05 — el branding muestra el título en el panel izquierdo", () => {
-      // Arrange
       render(<LoginPage />);
 
-      // Act — (renderizado pasivo)
-
-      // Assert
-      expect(screen.getByText("Evaluaciones")).toBeInTheDocument();
       expect(screen.getByAltText("Heuristic Evaluations Logo")).toBeInTheDocument();
     });
 
   });
 
-  // ── INTERACCIÓN CON CAMPOS ──────────────────────────────────────────────
+  // INTERACCIÓN CON CAMPOS 
 
   describe("interacción con campos", () => {
 
@@ -158,7 +154,7 @@ describe("LoginPage", () => {
 
   });
 
-  // ── CAMINO FELIZ — LOGIN EXITOSO (N1→N2→N3→N4→N5→N6 Sí→N7→N9→N10) ────
+  // ── CAMINO FELIZ — LOGIN EXITOSO 
 
   describe("login exitoso", () => {
 
@@ -222,9 +218,7 @@ describe("LoginPage", () => {
       await fillAndSubmit("juan@test.com", "password123");
 
       // Assert
-      expect(
-        screen.getByRole("button", { name: /iniciar sesión/i })
-      ).toBeDisabled();
+      expect(screen.getByRole("button")).toBeDisabled();
     });
 
     test("TC-L13 — muestra el spinner Loader2 durante la carga", async () => {

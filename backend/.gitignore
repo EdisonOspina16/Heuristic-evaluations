@@ -2,3 +2,5 @@
 .env
 __pycache__
 coverage.xml
+package-lock.json
+.package-lock.json

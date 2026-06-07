@@ -3,6 +3,9 @@
 package-lock.json
 .package-lock.json
 
+sonar-project.properties
+.sonar-project.properties
+
 # dependencies
 /node_modules
 /.pnp

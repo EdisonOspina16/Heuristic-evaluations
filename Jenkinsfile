@@ -20,12 +20,11 @@ pipeline {
 
         stage('Frontend Tests') {
             when { expression { params.RUN_UNIT_TESTS_FRONTEND } }
-
             steps {
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                         sh 'npm install'
-                        sh 'npm test'
+                        sh 'npm test -- --coverage --coverageReporters=lcov --coverageDirectory=coverage'
                     }
                 }
             }
@@ -49,7 +48,7 @@ pipeline {
                                 . venv/bin/activate
                                 pip install --upgrade pip
                                 pip install -r requirements.txt
-                                pytest
+                                pytest --cov=src --cov-report=xml:coverage.xml
                             '''
                         }
                     }

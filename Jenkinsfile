@@ -18,26 +18,6 @@ pipeline {
 
     stages {
 
-        stage('SonarQube') {
-            when { expression { params.RUN_SONAR } }
-
-            steps {
-                script {
-                    dir('backend') {
-                        withSonarQubeEnv('SonarQube') {
-                            sh 'npx sonar-scanner'
-                        }
-                    }
-
-                    dir('frontend') {
-                        withSonarQubeEnv('SonarQube') {
-                            sh 'npx sonar-scanner'
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Frontend Tests') {
             when { expression { params.RUN_UNIT_TESTS_FRONTEND } }
 
@@ -76,5 +56,26 @@ pipeline {
                 }
             }
         }
+
+        stage('SonarQube') {
+            when { expression { params.RUN_SONAR } }
+
+            steps {
+                script {
+                    dir('backend') {
+                        withSonarQubeEnv('SonarQube') {
+                            sh 'npx sonar-scanner'
+                        }
+                    }
+
+                    dir('frontend') {
+                        withSonarQubeEnv('SonarQube') {
+                            sh 'npx sonar-scanner'
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

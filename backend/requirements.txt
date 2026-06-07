@@ -11,3 +11,4 @@ pytest
 pytest-cov
 httpx2
 pysonar
+locust

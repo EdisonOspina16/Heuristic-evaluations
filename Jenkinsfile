@@ -101,7 +101,7 @@ pipeline {
             steps {
                 sh 'docker compose -f docker-compose.e2e.yml down || true'
 
-                sh 'docker compose -f docker-compose.e2e.yml up -d'
+                sh 'docker compose -f docker-compose.e2e.yml up -d --build'
 
                 sh '''
                 docker compose -f docker-compose.e2e.yml ps
@@ -109,9 +109,8 @@ pipeline {
                 docker compose -f docker-compose.e2e.yml logs frontend
                 '''
 
-                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://frontend-1:3000'
-
-                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://backend-1:8000'
+                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:3000'
+                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:8000'
             }
         }
 

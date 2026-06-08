@@ -102,8 +102,6 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')
                 ]) {
-                    sh 'docker compose -f docker-compose.e2e.yml down || true'
-
                     sh 'docker compose -f docker-compose.e2e.yml up -d --build'
 
                     sh '''
@@ -112,8 +110,14 @@ pipeline {
                     docker compose -f docker-compose.e2e.yml logs frontend
                     '''
 
-                    sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://heuristic-evaluations-pipeline-frontend-1:3000'
-                    sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://heuristic-evaluations-pipeline-backend-1:8000'
+                    sh '''
+                    FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
+                    BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
+                    echo "Frontend IP: $FRONTEND_IP"
+                    echo "Backend IP: $BACKEND_IP"
+                    curl --retry 30 --retry-delay 2 --retry-connrefused http://$FRONTEND_IP:3000
+                    curl --retry 30 --retry-delay 2 --retry-connrefused http://$BACKEND_IP:8000
+                    '''
                 }
             }
         }

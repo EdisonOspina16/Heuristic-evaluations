@@ -130,14 +130,19 @@ pipeline {
                         sh 'npm ci'
                         sh 'npx cypress install'
                         sh 'npx cypress verify'
-                        sh 'npm run cypress:run'
-                        sh 'npm run cypress:run'
+                        sh '''
+                            FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
+                            BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
+                            CYPRESS_BASE_URL=http://$FRONTEND_IP:3000 CYPRESS_API_URL=http://$BACKEND_IP:8000 npm run cypress:run
+                        '''
                     }
                 }
             }
             post {
                 always {
-                    sh 'docker compose -f docker-compose.e2e.yml down || true'
+                    withCredentials([string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')]) {
+                        sh 'docker compose -f docker-compose.e2e.yml down || true'
+                    }
                 }
             }
         }

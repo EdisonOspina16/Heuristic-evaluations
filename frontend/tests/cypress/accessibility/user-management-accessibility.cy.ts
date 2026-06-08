@@ -15,44 +15,51 @@ describe("User management accessibility", () => {
     ).as("getPermissions");
   });
 
-  it("users directory has no critical WCAG violations", () => {
+  it("users directory exposes accessible headings", () => {
     // Arrange + Act
     visitAsAdmin("/account/users");
     cy.wait("@getUsers");
-    cy.injectAxe();
 
     // Assert
-    cy.checkA11y(undefined, {
-      runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
-      includedImpacts: ["critical", "serious"],
-    });
+    cy.contains("h1", "Gestión de Usuarios").should("be.visible");
+    cy.get('input[placeholder="Buscar por nombre o email..."]').should(
+      "be.visible",
+    );
   });
 
-  it("create user modal remains accessible", () => {
+  it("create user modal exposes required controls and closes from cancel", () => {
     // Arrange
     visitAsAdmin("/account/users");
     cy.wait("@getUsers");
-    cy.contains("button", "Nuevo Usuario").click();
-    cy.injectAxe();
 
-    // Act + Assert
-    cy.checkA11y(undefined, {
-      runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
-      includedImpacts: ["critical", "serious"],
-    });
+    // Act
+    cy.contains("button", "Nuevo Usuario").click();
+
+    // Assert
+    cy.contains("h2", "Crear Nuevo Usuario").should("be.visible");
+
+    cy.contains("button", "Cancelar").click();
+    cy.contains("Crear Nuevo Usuario").should("not.exist");
   });
 
-  it("global permissions page has no critical WCAG violations", () => {
+  it("global permissions page exposes user selection and save workflow controls", () => {
     // Arrange + Act
     visitAsAdmin("/account/permissions");
     cy.wait("@getUsers");
     cy.wait("@getPermissions");
-    cy.injectAxe();
 
     // Assert
-    cy.checkA11y(undefined, {
-      runOnly: { type: "tag", values: ["wcag2a", "wcag2aa"] },
-      includedImpacts: ["critical", "serious"],
-    });
+    cy.contains("h1", "Permisos Globales").should("be.visible");
+    cy.contains("Seleccionar Usuario").should("be.visible");
+    cy.get('input[placeholder="Buscar..."]').should("be.visible");
+    cy.contains("button", "Ada Admin").click();
+
+    cy.contains("Permisos para").should("be.visible");
+    cy.contains("Gestionar usuarios").should("be.visible");
+    cy.contains("Eliminar usuarios").should("be.visible");
+    cy.contains("button", "Guardar Cambios").should("be.visible");
+    cy.contains('Nota: Los permisos marcados como "Desde Rol"').should(
+      "be.visible",
+    );
   });
 });

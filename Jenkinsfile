@@ -86,6 +86,15 @@ pipeline {
             }
         }
 
+        stage('Debug Backend') {
+            steps {
+                sh '''
+                cat backend/Dockerfile
+                ls -la backend
+                '''
+            }
+        }
+
         stage('Start E2E Environment') {
             when { expression { params.RUN_CYPRESS_TESTS } }
 
@@ -100,9 +109,9 @@ pipeline {
                 docker compose -f docker-compose.e2e.yml logs frontend
                 '''
 
-                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:3000'
+                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://frontend-1:3000'
 
-                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:8000'
+                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://backend-1:8000'
             }
         }
 

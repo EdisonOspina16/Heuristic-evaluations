@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="487.742" tests="41" failures="16">
+  <testsuite name="Root Suite" timestamp="2026-06-07T22:32:43" tests="0" file="cypress/e2e/evaluation.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="loadPlantilla — GET /plantillas/{id}/estructura" timestamp="2026-06-07T22:32:43" tests="0" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="F2-P01 | Happy path: plantilla found" timestamp="2026-06-07T22:32:43" tests="8" time="30.604" failures="1">
+    <testcase name="loadPlantilla — GET /plantillas/{id}/estructura F2-P01 | Happy path: plantilla found &quot;before each&quot; hook for &quot;muestra el título de la plantilla tras carga exitosa&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;muestra el título de la plantilla tras carga exitosa&quot;">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F2-P01 | Happy path: planti...`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F2-P01 | Happy path: planti...`
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:186:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="F2-P02 | Plantilla not found → 404" timestamp="2026-06-07T22:33:14" tests="3" time="30.429" failures="1">
+    <testcase name="loadPlantilla — GET /plantillas/{id}/estructura F2-P02 | Plantilla not found → 404 &quot;before each&quot; hook for &quot;muestra mensaje de error cuando el backend retorna 404&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;muestra mensaje de error cuando el backend retorna 404&quot;">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F2-P02 | Plantilla not foun...`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F2-P02 | Plantilla not foun...`
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:229:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="F2-CL01 | Boundary: id = 0 o negativo" timestamp="2026-06-07T22:33:44" tests="2" time="60.772" failures="2">
+    <testcase name="loadPlantilla — GET /plantillas/{id}/estructura F2-CL01 | Boundary: id = 0 o negativo muestra error cuando se visita con id=0" time="0.000" classname="muestra error cuando se visita con id=0">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:250:17)]]></failure>
+    </testcase>
+    <testcase name="loadPlantilla — GET /plantillas/{id}/estructura F2-CL01 | Boundary: id = 0 o negativo muestra error cuando se visita con id negativo" time="0.000" classname="muestra error cuando se visita con id negativo">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:257:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="F2-CL02 | Boundary: plantilla con dimensiones = []" timestamp="2026-06-07T22:34:45" tests="3" time="30.642" failures="1">
+    <testcase name="loadPlantilla — GET /plantillas/{id}/estructura F2-CL02 | Boundary: plantilla con dimensiones = [] &quot;before each&quot; hook for &quot;renderiza la página sin error cuando dimensiones está vacío&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;renderiza la página sin error cuando dimensiones está vacío&quot;">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F2-CL02 | Boundary: plantil...`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F2-CL02 | Boundary: plantil...`
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:267:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Loading state" timestamp="2026-06-07T22:35:16" tests="1" time="31.002" failures="1">
+    <testcase name="loadPlantilla — GET /plantillas/{id}/estructura Loading state muestra spinner durante la petición a /estructura" time="0.000" classname="muestra spinner durante la petición a /estructura">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:292:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Network / timeout error" timestamp="2026-06-07T22:35:47" tests="1" time="30.449" failures="1">
+    <testcase name="loadPlantilla — GET /plantillas/{id}/estructura Network / timeout error muestra error cuando la red falla (forceNetworkError)" time="0.000" classname="muestra error cuando la red falla (forceNetworkError)">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:304:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="getProgress — GET /evaluaciones/progress/{id}" timestamp="2026-06-07T22:36:17" tests="0" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="F3-P01 | Reanuda borrador con respuestas guardadas" timestamp="2026-06-07T22:36:17" tests="5" time="30.369" failures="1">
+    <testcase name="getProgress — GET /evaluaciones/progress/{id} F3-P01 | Reanuda borrador con respuestas guardadas &quot;before each&quot; hook for &quot;restaura valor_numerico en el input correspondiente&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;restaura valor_numerico en el input correspondiente&quot;">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F3-P01 | Reanuda borrador c...`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F3-P01 | Reanuda borrador c...`
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:318:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="F1-CL01 | Boundary: valor_numerico = 0" timestamp="2026-06-07T22:36:47" tests="1" time="30.456" failures="1">
+    <testcase name="getProgress — GET /evaluaciones/progress/{id} F1-CL01 | Boundary: valor_numerico = 0 restaura valor 0 sin descartarlo por ser falsy" time="0.000" classname="restaura valor 0 sin descartarlo por ser falsy">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:358:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="F3-CL01 | Boundary: progress.respuestas = []" timestamp="2026-06-07T22:37:18" tests="3" time="30.534" failures="1">
+    <testcase name="getProgress — GET /evaluaciones/progress/{id} F3-CL01 | Boundary: progress.respuestas = [] &quot;before each&quot; hook for &quot;no rompe el flujo cuando progress.respuestas está vacío&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;no rompe el flujo cuando progress.respuestas está vacío&quot;">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F3-CL01 | Boundary: progres...`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `F3-CL01 | Boundary: progres...`
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:371:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="F3-P02 | Error: evaluation progress not found → 404" timestamp="2026-06-07T22:37:48" tests="2" time="61.062" failures="2">
+    <testcase name="getProgress — GET /evaluaciones/progress/{id} F3-P02 | Error: evaluation progress not found → 404 muestra error cuando getProgress retorna 404" time="0.000" classname="muestra error cuando getProgress retorna 404">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:398:17)]]></failure>
+    </testcase>
+    <testcase name="getProgress — GET /evaluaciones/progress/{id} F3-P02 | Error: evaluation progress not found → 404 loading termina en false incluso cuando getProgress falla" time="0.000" classname="loading termina en false incluso cuando getProgress falla">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:407:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="F1-CL02 | Boundary: sin evaluationId → no llama getProgress" timestamp="2026-06-07T22:38:50" tests="1" time="30.421" failures="1">
+    <testcase name="getProgress — GET /evaluaciones/progress/{id} F1-CL02 | Boundary: sin evaluationId → no llama getProgress NO llama getProgress cuando evaluationId es undefined" time="0.000" classname="NO llama getProgress cuando evaluationId es undefined">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:418:17)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="saveProgress — PATCH /evaluaciones/progress" timestamp="2026-06-07T22:39:20" tests="0" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Happy path" timestamp="2026-06-07T22:39:20" tests="3" time="30.408" failures="1">
+    <testcase name="saveProgress — PATCH /evaluaciones/progress Happy path &quot;before each&quot; hook for &quot;envía PATCH con la estructura correcta al guardar progreso&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;envía PATCH con la estructura correcta al guardar progreso&quot;">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `saveProgress — PATCH /evalu...`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `saveProgress — PATCH /evalu...`
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:430:13)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="submit — POST /evaluaciones/" timestamp="2026-06-07T22:39:50" tests="0" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="Happy path" timestamp="2026-06-07T22:39:50" tests="3" time="30.332" failures="1">
+    <testcase name="submit — POST /evaluaciones/ Happy path &quot;before each&quot; hook for &quot;envía POST con todos los campos requeridos al hacer submit&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;envía POST con todos los campos requeridos al hacer submit&quot;">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `submit — POST /evaluaciones/`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `submit — POST /evaluaciones/`
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:505:13)]]></failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="updateRespuesta — Interacción con el formulario de respuestas" timestamp="2026-06-07T22:40:21" tests="5" time="30.246" failures="1">
+    <testcase name="updateRespuesta — Interacción con el formulario de respuestas &quot;before each&quot; hook for &quot;actualiza el valor de un input numérico al escribir&quot;" time="0.000" classname="&quot;before each&quot; hook for &quot;actualiza el valor de un input numérico al escribir&quot;">
+      <failure message="Timed out retrying after 30000ms: Expected to find element: `[data-cy=&quot;plantilla-title&quot;], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `updateRespuesta — Interacci...`" type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 30000ms: Expected to find element: `[data-cy="plantilla-title"], #__next, main`, but never found it.
+
+Because this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `updateRespuesta — Interacci...`
+    at EvaluationPage.visit (webpack://frontend/./cypress/e2e/evaluation.cy.ts:104:81)
+    at Context.eval (webpack://frontend/./cypress/e2e/evaluation.cy.ts:580:13)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>

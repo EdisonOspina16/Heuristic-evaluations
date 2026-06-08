@@ -21,12 +21,12 @@ interface EvaluationFormProps {
  * Componente de formulario dinámico que renderiza una plantilla de evaluación completa.
  * Organiza las preguntas por dimensiones y permite responder según el tipo (Likert o Selección).
  */
-export const EvaluationForm: React.FC<EvaluationFormProps> = ({ 
-  plantillaId, 
-  projectId, 
+export const EvaluationForm: React.FC<EvaluationFormProps> = ({
+  plantillaId,
+  projectId,
   userId,
   evaluationId,
-  onSuccess 
+  onSuccess
 }) => {
   const { plantilla, loading, error, respuestas, updateRespuesta, submit, saveProgress, lastSavedAt } = useEvaluation(plantillaId, evaluationId);
   const [saving, setSaving] = React.useState(false);
@@ -99,7 +99,7 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
     );
   }
 
-  if (error) return <div className="text-red-500 p-8">Error: {error}</div>;
+  if (error) return <div data-cy="error-message" className="text-red-500 p-8">Error: {error}</div>;
   if (!plantilla) return null;
 
   return (
@@ -107,6 +107,26 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-white">{plantilla.nombre}</h1>
         <p className="text-zinc-500">{plantilla.descripcion}</p>
+
+        {/* ── Progress indicators ── */}
+        <div
+          data-cy="progress-bar"
+          role="progressbar"
+          aria-valuenow={progressPercent}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden"
+        >
+          <div
+            className="h-full bg-brand-500 transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+
+        <div data-cy="progress-count" className="text-xs text-zinc-500">
+          {answeredQuestions} / {totalQuestions}
+        </div>
+
         <div className="flex items-center gap-2 text-xs text-zinc-500">
           <Save className="w-3 h-3" />
           {saving ? "Guardando progreso..." : lastSavedAt ? `Progreso guardado ${lastSavedAt.toLocaleTimeString()}` : "El progreso se guarda automáticamente"}
@@ -115,14 +135,38 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
 
       {plantilla.dimensiones.map((dimension) => (
         <section key={dimension.id} className="space-y-6">
-          <h2 className="text-xl font-semibold text-brand-400 border-b border-white/10 pb-2">
+          {/* data-cy used by tests that count/read dimension headings */}
+          <h2
+            data-cy="dimension-title"
+            className="text-xl font-semibold text-brand-400 border-b border-white/10 pb-2"
+          >
             {dimension.nombre}
           </h2>
-          
+
           <div className="space-y-8">
             {dimension.preguntas.map((pregunta) => (
               <Card key={pregunta.id} className="bg-white/[0.02] border-white/5">
                 <CardContent className="pt-6 space-y-6">
+                  {/*
+                    Hidden input per question — single source of truth for test selectors.
+                    data-cy="respuesta-input-{id}" covers both:
+                      • [data-cy^="respuesta-input-"]  → generic count assertion
+                      • [data-cy=respuesta-input-101]  → specific value assertion after hydration
+                    value mirrors valor_numerico (likert) or opcion_id (selección) as a string.
+                  */}
+                  <input
+                    type="hidden"
+                    data-cy={`respuesta-input-${pregunta.id}`}
+                    value={
+                      respuestas[pregunta.id]?.valor_numerico !== undefined
+                        ? String(respuestas[pregunta.id].valor_numerico)
+                        : respuestas[pregunta.id]?.opcion_id !== undefined
+                          ? String(respuestas[pregunta.id].opcion_id)
+                          : ""
+                    }
+                    readOnly
+                  />
+
                   <div className="space-y-2">
                     <p className="text-lg text-white font-medium">{pregunta.texto}</p>
                     {pregunta.texto_en && (
@@ -138,8 +182,8 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                           const val = i + 1;
                           const isSelected = respuestas[pregunta.id]?.valor_numerico === val;
                           return (
-                            <div 
-                              key={i} 
+                            <div
+                              key={i}
                               className="flex flex-col items-center gap-2 cursor-pointer group"
                               onClick={() => {
                                 if (isSelected) {
@@ -149,11 +193,10 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                                 }
                               }}
                             >
-                              <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${
-                                isSelected 
-                                  ? "border-brand-500 bg-brand-500/20" 
+                              <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${isSelected
+                                  ? "border-brand-500 bg-brand-500/20"
                                   : "border-white/20 group-hover:border-white/40"
-                              }`}>
+                                }`}>
                                 {isSelected && <div className="w-3 h-3 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />}
                               </div>
                               <span className={`text-xs transition-colors ${isSelected ? "text-brand-400 font-bold" : "text-zinc-500 group-hover:text-zinc-400"}`}>
@@ -168,8 +211,8 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                         {pregunta.opciones.map((opcion) => {
                           const isSelected = respuestas[pregunta.id]?.opcion_id === opcion.id;
                           return (
-                            <div 
-                              key={opcion.id} 
+                            <div
+                              key={opcion.id}
                               onClick={() => {
                                 if (isSelected) {
                                   updateRespuesta(pregunta.id, { opcion_id: undefined });
@@ -177,15 +220,13 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                                   updateRespuesta(pregunta.id, { opcion_id: opcion.id });
                                 }
                               }}
-                              className={`flex items-center space-x-3 p-4 rounded-2xl border transition-all cursor-pointer ${
-                                isSelected 
-                                  ? "border-brand-500/50 bg-brand-500/10 shadow-lg shadow-brand-500/5" 
+                              className={`flex items-center space-x-3 p-4 rounded-2xl border transition-all cursor-pointer ${isSelected
+                                  ? "border-brand-500/50 bg-brand-500/10 shadow-lg shadow-brand-500/5"
                                   : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10"
-                              }`}
+                                }`}
                             >
-                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${
-                                isSelected ? "border-brand-500" : "border-white/20"
-                              }`}>
+                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isSelected ? "border-brand-500" : "border-white/20"
+                                }`}>
                                 {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-brand-500" />}
                               </div>
                               <span className={`flex-1 text-sm transition-colors ${isSelected ? "text-white font-medium" : "text-zinc-400"}`}>
@@ -200,7 +241,7 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
 
                   <div className="space-y-2">
                     <Label className="text-xs text-zinc-500 uppercase">Comentarios / Observaciones</Label>
-                    <Textarea 
+                    <Textarea
                       placeholder="Agrega detalles adicionales..."
                       className="bg-black/20 border-white/5 resize-none h-20"
                       value={respuestas[pregunta.id]?.comentario || ""}
@@ -221,11 +262,10 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
           size="lg"
           disabled={loading || saving}
           onClick={handleManualSave}
-          className={`px-6 py-6 text-lg bg-zinc-950/90 backdrop-blur border-white/10 transition-all duration-500 ${
-            showSaveProgress
+          className={`px-6 py-6 text-lg bg-zinc-950/90 backdrop-blur border-white/10 transition-all duration-500 ${showSaveProgress
               ? "opacity-100 translate-y-0 pointer-events-auto"
               : "opacity-0 translate-y-3 pointer-events-none"
-          }`}
+            }`}
         >
           {saving ? (
             <Loader2 className="w-5 h-5 animate-spin mr-2" />
@@ -234,9 +274,9 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
           )}
           Guardar progreso
         </Button>
-        <Button 
-          type="submit" 
-          size="lg" 
+        <Button
+          type="submit"
+          size="lg"
           disabled={loading}
           className="shadow-2xl shadow-brand-500/20 px-8 py-6 text-lg"
         >

@@ -48,7 +48,9 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
           };
         });
       });
-      if (existingEvaluationId) {
+
+      // existingEvaluationId may legitimately be 0, so guard with != null rather than falsy check
+      if (existingEvaluationId != null) {
         const progress = await evaluationsService.getProgress(existingEvaluationId);
         progress.respuestas.forEach(resp => {
           initialRespuestas[resp.pregunta_id] = {
@@ -70,7 +72,8 @@ export const useEvaluation = (plantillaId?: number, evaluationId?: number) => {
   }, []);
 
   useEffect(() => {
-    if (plantillaId) {
+    // Use != null so plantillaId=0 still loads (mirrors the guard above)
+    if (plantillaId != null) {
       loadPlantilla(plantillaId, evaluationId);
     }
   }, [plantillaId, evaluationId, loadPlantilla]);

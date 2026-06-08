@@ -94,7 +94,11 @@ pipeline {
 
                 sh 'docker compose -f docker-compose.e2e.yml up -d'
 
-                sh 'docker compose -f docker-compose.e2e.yml ps'
+                sh '''
+                docker compose -f docker-compose.e2e.yml ps
+                docker compose -f docker-compose.e2e.yml logs backend
+                docker compose -f docker-compose.e2e.yml logs frontend
+                '''
 
                 sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:3000'
 

@@ -92,7 +92,7 @@ describe("UsersManagementPage", () => {
     mockUsersFetch();
     mockedAxios.post.mockResolvedValueOnce({ data: { id: 4 } });
     mockedAxios.get.mockResolvedValueOnce({ data: usersApiPayload });
-    render(<UsersManagementPage />);
+    const { container } = render(<UsersManagementPage />);
     await screen.findByText("Ada Admin");
 
     // Act
@@ -100,7 +100,7 @@ describe("UsersManagementPage", () => {
     fireEvent.change(screen.getByPlaceholderText("Fullname"), { target: { value: "New Admin" } });
     fireEvent.change(screen.getByPlaceholderText("user@ejemplo.com"), { target: { value: "new@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("••••••••"), { target: { value: "Secret123!" } });
-    fireEvent.change(screen.getByDisplayValue("EVALUADOR"), { target: { value: "ADMIN" } });
+    fireEvent.change(container.querySelector("select") as HTMLSelectElement, { target: { value: "ADMIN" } });
     fireEvent.click(screen.getByRole("button", { name: /crear usuario/i }));
 
     // Assert

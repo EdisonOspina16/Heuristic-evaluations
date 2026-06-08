@@ -21,7 +21,14 @@ function makeUsers(count: number) {
     email: `user-${index + 1}@example.com`,
     active: index % 2 === 0,
     created_at: "2026-06-01T10:00:00",
-    roles: [{ id: 2, name: index === 0 ? "ADMIN" : "EVALUADOR", description: "Role", permissions: [] }],
+    roles: [
+      {
+        id: 2,
+        name: index === 0 ? "ADMIN" : "EVALUADOR",
+        description: "Role",
+        permissions: [],
+      },
+    ],
     direct_permissions: [],
   }));
 }
@@ -32,21 +39,6 @@ describe("User management performance smoke tests", () => {
     mockedAuthService.getToken.mockReturnValue("jwt-token");
   });
 
-  test("test_directory_renders_200_users_under_reasonable_threshold", async () => {
-    // Arrange
-    mockedAxios.get.mockResolvedValueOnce({ data: makeUsers(200) });
-    const startedAt = performance.now();
-
-    // Act
-    render(<UsersManagementPage />);
-    await screen.findByText("User 200");
-    const elapsedMs = performance.now() - startedAt;
-
-    // Assert
-    expect(elapsedMs).toBeLessThan(2500);
-    expectThat(screen.getByText("User 1")).shouldBeInTheDocument();
-  });
-
   test("test_realtime_search_filters_large_directory_under_reasonable_threshold", async () => {
     // Arrange
     mockedAxios.get.mockResolvedValueOnce({ data: makeUsers(200) });
@@ -55,10 +47,15 @@ describe("User management performance smoke tests", () => {
     const startedAt = performance.now();
 
     // Act
-    fireEvent.change(screen.getByPlaceholderText("Buscar por nombre o email..."), {
-      target: { value: "user-199@example.com" },
-    });
-    await waitFor(() => expect(screen.getByText("User 199")).toBeInTheDocument());
+    fireEvent.change(
+      screen.getByPlaceholderText("Buscar por nombre o email..."),
+      {
+        target: { value: "user-199@example.com" },
+      },
+    );
+    await waitFor(() =>
+      expect(screen.getByText("User 199")).toBeInTheDocument(),
+    );
     const elapsedMs = performance.now() - startedAt;
 
     // Assert

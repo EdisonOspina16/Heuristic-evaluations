@@ -8,6 +8,7 @@ const pushMock = jest.fn();
 (globalThis as typeof globalThis & { __NEXT_PUSH_MOCK__?: jest.Mock }).__NEXT_PUSH_MOCK__ = pushMock;
 
 jest.mock("next/navigation", () => ({
+    usePathname: () => "/account/users",
     useRouter: () => ({
         push: pushMock,
         replace: jest.fn(),
@@ -54,6 +55,8 @@ jest.mock("framer-motion", () => {
         });
 
     return {
+        AnimatePresence: ({ children }: { children: React.ReactNode }) =>
+            React.createElement(React.Fragment, null, children),
         motion: new Proxy(
             {},
             {

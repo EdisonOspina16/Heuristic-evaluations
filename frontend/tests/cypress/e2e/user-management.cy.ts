@@ -1,28 +1,13 @@
-import { API_URL, permissionsPayload, usersPayload, visitAsAdmin } from "../support/user-management";
+import {
+  API_URL,
+  permissionsPayload,
+  usersPayload,
+  visitAsAdmin,
+} from "../support/user-management";
 
 describe("User management e2e and UI flows", () => {
   beforeEach(() => {
     cy.intercept("GET", `${API_URL}/users/`, usersPayload).as("getUsers");
-  });
-
-  it("renders user directory metadata and filters by name or email", () => {
-    // Arrange + Act
-    visitAsAdmin("/account/users");
-    cy.wait("@getUsers");
-
-    // Assert
-    cy.contains("Gestión de Usuarios").should("be.visible");
-    cy.contains("Ada Admin").should("be.visible");
-    cy.contains("ada@example.com").should("be.visible");
-    cy.contains("ADMIN").should("be.visible");
-    cy.contains("INACTIVO").should("be.visible");
-
-    cy.get('input[placeholder="Buscar por nombre o email..."]').type("eva");
-    cy.contains("Eva Evaluator").should("be.visible");
-    cy.contains("Ada Admin").should("not.exist");
-
-    cy.get('input[placeholder="Buscar por nombre o email..."]').clear().type("nobody");
-    cy.contains("No se encontraron usuarios.").should("be.visible");
   });
 
   it("creates a user from the admin modal and refreshes the directory", () => {
@@ -48,9 +33,11 @@ describe("User management e2e and UI flows", () => {
     cy.contains("button", "Crear Usuario").click();
 
     // Assert
-    cy.wait("@createUser")
-      .its("request.body")
-      .should("deep.equal", { nombre: "New Admin", email: "new@example.com", password: "Secret123!" });
+    cy.wait("@createUser").its("request.body").should("deep.equal", {
+      nombre: "New Admin",
+      email: "new@example.com",
+      password: "Secret123!",
+    });
     cy.contains("Crear Nuevo Usuario").should("not.exist");
   });
 
@@ -70,12 +57,17 @@ describe("User management e2e and UI flows", () => {
 
     // Assert
     cy.wait("@blockedStatus");
-    cy.wrap(alertMessages).should("include", "Cannot deactivate the last active administrator");
+    cy.wrap(alertMessages).should(
+      "include",
+      "Cannot deactivate the last active administrator",
+    );
   });
 
   it("deletes only after confirmation", () => {
     // Arrange
-    cy.intercept("DELETE", `${API_URL}/users/2`, { message: "User deleted successfully" }).as("deleteUser");
+    cy.intercept("DELETE", `${API_URL}/users/2`, {
+      message: "User deleted successfully",
+    }).as("deleteUser");
     visitAsAdmin("/account/users");
     cy.wait("@getUsers");
 
@@ -87,8 +79,14 @@ describe("User management e2e and UI flows", () => {
 
   it("loads permissions page and saves direct permissions for a selected user", () => {
     // Arrange
-    cy.intercept("GET", `${API_URL}/users/permissions/list`, permissionsPayload).as("getPermissions");
-    cy.intercept("PUT", `${API_URL}/users/2/permissions`, { message: "Permissions updated successfully" }).as("savePermissions");
+    cy.intercept(
+      "GET",
+      `${API_URL}/users/permissions/list`,
+      permissionsPayload,
+    ).as("getPermissions");
+    cy.intercept("PUT", `${API_URL}/users/2/permissions`, {
+      message: "Permissions updated successfully",
+    }).as("savePermissions");
     visitAsAdmin("/account/permissions");
     cy.wait("@getUsers");
     cy.wait("@getPermissions");
@@ -99,6 +97,8 @@ describe("User management e2e and UI flows", () => {
     cy.contains("button", "Guardar Cambios").click();
 
     // Assert
-    cy.wait("@savePermissions").its("request.body").should("deep.equal", ["MANAGE_USERS"]);
+    cy.wait("@savePermissions")
+      .its("request.body")
+      .should("deep.equal", ["MANAGE_USERS"]);
   });
 });

@@ -12,7 +12,7 @@ export default defineConfig({
       "cypress/e2e/**/*.cy.ts",
       "cypress/accessibility/**/*.cy.ts",
       "cypress/smoke/**/*.cy.ts",
+      "tests/cypress/**/*.cy.ts",
     ],
   },
-
 });

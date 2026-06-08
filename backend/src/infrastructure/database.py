@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/heuristic_db")
+
 print(f"Conectando a la base de datos en {DATABASE_URL}")
 
 if DATABASE_URL.startswith("postgres://"):
@@ -16,11 +17,10 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Importar todos los modelos para que Base los registre
-from src.infrastructure.models import *  # noqa
+from src.infrastructure.models import User, Proyecto, Evaluacion, Plantilla
 
-# Esto crea las tablas automáticamente
-Base.metadata.create_all(bind=engine)
+def init_db():
+    Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()

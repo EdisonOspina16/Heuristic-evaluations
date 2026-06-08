@@ -11,6 +11,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgtk2.0-0 \
     libgtk-3-0 \
     libgbm-dev \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libx11-xcb1 \
     libnotify-dev \
     libnss3 \
     libxss1 \
@@ -20,6 +24,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN apt-get update && apt-get install -y docker.io \
     && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
+    curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m) \
+    -o /usr/local/lib/docker/cli-plugins/docker-compose && \
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
+    curl -SL https://github.com/docker/buildx/releases/latest/download/buildx-linux-$(uname -m) \
+    -o /usr/local/lib/docker/cli-plugins/docker-buildx && \
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-venv \

@@ -28,6 +28,16 @@ pnpm dev
 
 pytest --cov=src --cov-report=xml:coverage.xml
 
+pytest --cov=. --cov-report=xml
+
+Luego, ejecutar el siguiente comando:
+
+sonar
+
 ## Para Correr Tests con Coverage en el Frontend
 
 npm test -- --coverage --coverageReporters=lcov --coverageDirectory=coverage
+
+Luego, ejecutar el siguiente comando:
+
+sonar

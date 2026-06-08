@@ -26,14 +26,17 @@ RUN apt-get update && apt-get install -y docker.io \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
-    curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-$(uname -m) \
+    ARCH=$(uname -m) && \
+    if [ "$ARCH" = "x86_64" ]; then ARCH="x86_64"; \
+    elif [ "$ARCH" = "aarch64" ]; then ARCH="aarch64"; \
+    else ARCH="x86_64"; fi && \
+    curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-${ARCH} \
     -o /usr/local/lib/docker/cli-plugins/docker-compose && \
     chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 
-RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
-    curl -SL https://github.com/docker/buildx/releases/latest/download/buildx-linux-$(uname -m) \
-    -o /usr/local/lib/docker/cli-plugins/docker-buildx && \
-    chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
+COPY --from=docker/buildx-bin:latest /buildx /usr/local/lib/docker/cli-plugins/docker-buildx
+
+RUN chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
 RUN apt-get update -y && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-venv \

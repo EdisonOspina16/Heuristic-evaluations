@@ -92,7 +92,7 @@ pipeline {
             steps {
                 sh 'docker compose -f docker-compose.e2e.yml down || true'
 
-                sh 'docker compose -f docker-compose.e2e.yml up -d --build'
+                sh 'docker compose -f docker-compose.e2e.yml up -d'
 
                 sh 'docker compose -f docker-compose.e2e.yml ps'
 

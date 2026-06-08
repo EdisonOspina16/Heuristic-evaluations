@@ -112,6 +112,7 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
         <div
           data-cy="progress-bar"
           role="progressbar"
+          aria-label={`Progreso de evaluación ${progressPercent}%`}
           aria-valuenow={progressPercent}
           aria-valuemin={0}
           aria-valuemax={100}
@@ -194,8 +195,8 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                               }}
                             >
                               <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${isSelected
-                                  ? "border-brand-500 bg-brand-500/20"
-                                  : "border-white/20 group-hover:border-white/40"
+                                ? "border-brand-500 bg-brand-500/20"
+                                : "border-white/20 group-hover:border-white/40"
                                 }`}>
                                 {isSelected && <div className="w-3 h-3 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />}
                               </div>
@@ -221,8 +222,8 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                                 }
                               }}
                               className={`flex items-center space-x-3 p-4 rounded-2xl border transition-all cursor-pointer ${isSelected
-                                  ? "border-brand-500/50 bg-brand-500/10 shadow-lg shadow-brand-500/5"
-                                  : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10"
+                                ? "border-brand-500/50 bg-brand-500/10 shadow-lg shadow-brand-500/5"
+                                : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10"
                                 }`}
                             >
                               <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isSelected ? "border-brand-500" : "border-white/20"
@@ -263,8 +264,8 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
           disabled={loading || saving}
           onClick={handleManualSave}
           className={`px-6 py-6 text-lg bg-zinc-950/90 backdrop-blur border-white/10 transition-all duration-500 ${showSaveProgress
-              ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 translate-y-3 pointer-events-none"
+            ? "opacity-100 translate-y-0 pointer-events-auto"
+            : "opacity-0 translate-y-3 pointer-events-none"
             }`}
         >
           {saving ? (

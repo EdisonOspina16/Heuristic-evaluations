@@ -6,6 +6,8 @@ package-lock.json
 sonar-project.properties
 .sonar-project.properties
 
+.scannerwork/report-task.txt
+
 # dependencies
 /node_modules
 /.pnp

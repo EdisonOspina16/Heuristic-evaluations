@@ -6,3 +6,7 @@ package-lock.json
 .package-lock.json
 sonar-project.properties
 .sonar-project.properties
+.coverage
+.scannerwork/report-task.txt
+.sonar/report-task.txt
+

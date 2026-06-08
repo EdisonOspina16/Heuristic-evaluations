@@ -1,3 +1,6 @@
+import { expect } from '@jest/globals';
+import '@testing-library/jest-dom';
+
 export class FluentAssertion<T> {
   constructor(private readonly actual: T) {}
 
@@ -16,13 +19,13 @@ export class FluentAssertion<T> {
     return this;
   }
 
-  shouldBeInTheDocument() {
-    expect(this.actual).toBeInTheDocument();
-    return this;
-  }
+  // shouldBeInTheDocument() {
+  //   expect(this.actual as any).toBeInTheDocument();
+  //   return this;
+  // }
 
   shouldHaveBeenCalledWith(...expected: unknown[]) {
-    expect(this.actual).toHaveBeenCalledWith(...expected);
+    expect(this.actual as any).toHaveBeenCalledWith(...expected);
     return this;
   }
 
@@ -30,8 +33,4 @@ export class FluentAssertion<T> {
     expect(this.actual).toHaveLength(expected);
     return this;
   }
-}
-
-export function expectThat<T>(actual: T) {
-  return new FluentAssertion(actual);
 }

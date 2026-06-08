@@ -99,3 +99,5 @@ it("navigates to register page from login", () => {
   cy.url().should("include", "/register");
 });
 });
+
+export {};

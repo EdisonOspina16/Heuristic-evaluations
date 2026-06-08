@@ -1,4 +1,5 @@
 import axios from "axios";
+import { expect as chaiExpect } from "chai";
 
 import { authService } from "@/features/auth/services/auth.service";
 import { expectThat } from "./fluent";
@@ -42,6 +43,17 @@ describe("authService user administration permissions", () => {
 
     // Assert
     expectThat(canManageUsers).shouldBe(false);
+  });
+
+  test("test_can_returns_false_when_no_user_is_logged_in", () => {
+    // Arrange
+    localStorage.removeItem("user");
+
+    // Act
+    const canManageUsers = authService.can("MANAGE_USERS");
+
+    // Assert
+    chaiExpect(canManageUsers).to.be.false;
   });
 
   test("test_get_token_uses_legacy_token_fallback_for_existing_sessions", () => {

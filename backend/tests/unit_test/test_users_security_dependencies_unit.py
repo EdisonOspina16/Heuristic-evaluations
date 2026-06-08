@@ -1,6 +1,7 @@
 import pytest
 import jwt
 from fastapi import HTTPException
+from hamcrest import assert_that, equal_to
 
 from src.application.services import security as security_module
 from src.application.services.security import ALGORITHM, SECRET_KEY, check_permissions, get_current_user
@@ -105,3 +106,46 @@ def test_get_current_user_auto_repairs_first_user_without_roles():
     expect(result.roles[0].name).should_equal("ADMIN")
     expect(db.commits).should_equal(1)
     expect(db.refreshed).should_equal([first_user])
+
+
+def test_get_current_user_rejects_inactive_user():
+    # Arrange
+    inactive_user = user(5, active=False)
+    token = jwt.encode({"sub": inactive_user.email}, SECRET_KEY, algorithm=ALGORITHM)
+    db = FakeSession({User: [FakeQuery(first=inactive_user)]})
+
+    # Act
+    with pytest.raises(HTTPException) as exc:
+        get_current_user(token=token, db=db)
+
+    # Assert
+    assert_that(exc.value.status_code, equal_to(400))
+    assert_that(exc.value.detail, equal_to("Inactive user"))
+
+
+def test_get_current_user_rejects_invalid_token_signature():
+    # Arrange
+    token = jwt.encode({"sub": "admin@example.com"}, "wrongsecret", algorithm=ALGORITHM)
+    db = FakeSession({})
+
+    # Act
+    with pytest.raises(HTTPException) as exc:
+        get_current_user(token=token, db=db)
+
+    # Assert
+    assert_that(exc.value.status_code, equal_to(401))
+    assert_that(exc.value.detail, equal_to("Could not validate credentials"))
+
+
+def test_check_permissions_allows_permission_from_multiple_roles():
+    # Arrange
+    role_one = role("EVALUADOR", ["MANAGE_USERS"])
+    role_two = role("EVALUADOR", ["DELETE_USERS"])
+    current_user = user(6, roles=[role_one, role_two])
+    dependency = check_permissions("DELETE_USERS")
+
+    # Act
+    result = dependency(current_user=current_user)
+
+    # Assert
+    expect(result).should_be(current_user)

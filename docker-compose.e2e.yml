@@ -4,6 +4,8 @@ services:
       context: ./backend
     ports:
       - "8000:8000"
+    networks:
+      - jenkins_network
 
   frontend:
     build:
@@ -12,3 +14,10 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - jenkins_network
+
+networks:
+  jenkins_network:
+    external: true
+    name: bridge

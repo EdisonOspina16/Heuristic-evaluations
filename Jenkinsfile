@@ -99,18 +99,22 @@ pipeline {
             when { expression { params.RUN_CYPRESS_TESTS } }
 
             steps {
-                sh 'docker compose -f docker-compose.e2e.yml down || true'
+                withCredentials([
+                    string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')
+                ]) {
+                    sh 'docker compose -f docker-compose.e2e.yml down || true'
 
-                sh 'docker compose -f docker-compose.e2e.yml up -d --build'
+                    sh 'docker compose -f docker-compose.e2e.yml up -d --build'
 
-                sh '''
-                docker compose -f docker-compose.e2e.yml ps
-                docker compose -f docker-compose.e2e.yml logs backend
-                docker compose -f docker-compose.e2e.yml logs frontend
-                '''
+                    sh '''
+                    docker compose -f docker-compose.e2e.yml ps
+                    docker compose -f docker-compose.e2e.yml logs backend
+                    docker compose -f docker-compose.e2e.yml logs frontend
+                    '''
 
-                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:3000'
-                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:8000'
+                    sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://heuristic-evaluations-pipeline-frontend-1:3000'
+                    sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://heuristic-evaluations-pipeline-backend-1:8000'
+                }
             }
         }
 

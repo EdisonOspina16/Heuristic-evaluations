@@ -3,7 +3,7 @@ const API_URL = Cypress.env("apiUrl") as string;
 
 describe("Login flow", () => {
   const user = {
-    nombre: "Cypress Tester",
+    nombre: "Cypress Tester NO BORRAR",
     email: "cypress.tester@example.com",
     password: "Secret123!"
   }

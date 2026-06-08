@@ -5,6 +5,19 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
     curl wget git unzip zip ca-certificates gnupg lsb-release build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    xvfb \
+    xauth \
+    libgtk2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libnotify-dev \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libxtst6 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN apt-get update && apt-get install -y docker.io \
     && rm -rf /var/lib/apt/lists/*
 

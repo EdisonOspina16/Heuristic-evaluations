@@ -91,6 +91,10 @@ pipeline {
             steps {
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+                        sh 'npm ci'
+                        sh 'npx cypress install'
+                        sh 'npx cypress verify'
+                        sh 'npm run cypress:run'
                         sh 'npm run cypress:run'
                     }
                 }

@@ -86,6 +86,22 @@ pipeline {
             }
         }
 
+        stage('Start E2E Environment') {
+            when { expression { params.RUN_CYPRESS_TESTS } }
+
+            steps {
+                sh 'docker compose -f docker-compose.e2e.yml down || true'
+
+                sh 'docker compose -f docker-compose.e2e.yml up -d --build'
+
+                sh 'docker compose -f docker-compose.e2e.yml ps'
+
+                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:3000'
+
+                sh 'curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:8000'
+            }
+        }
+
         stage('Cypress Tests') {
             when { expression { params.RUN_CYPRESS_TESTS } }
             steps {
@@ -97,6 +113,11 @@ pipeline {
                         sh 'npm run cypress:run'
                         sh 'npm run cypress:run'
                     }
+                }
+            }
+            post {
+                always {
+                    sh 'docker compose -f docker-compose.e2e.yml down || true'
                 }
             }
         }

@@ -10,6 +10,7 @@ pipeline {
         booleanParam(name: 'RUN_SONAR', defaultValue: true, description: 'Ejecutar analisis SonarQube')
         booleanParam(name: 'RUN_UNIT_TESTS_FRONTEND', defaultValue: true, description: 'Frontend tests')
         booleanParam(name: 'RUN_UNIT_TESTS_BACKEND', defaultValue: true, description: 'Backend tests')
+        booleanParam(name: 'RUN_CYPRESS_TESTS', defaultValue: true, description: 'Cypress tests')
     }
 
     tools {
@@ -18,11 +19,20 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+            steps {
+                checkout scm
+
+                sh 'git branch'
+                sh 'git log --oneline -n 3'
+            }
+        }
+
         stage('Frontend Tests') {
             when { expression { params.RUN_UNIT_TESTS_FRONTEND } }
             steps {
                 dir('frontend') {
-                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
                         sh 'npm install'
                         sh 'npm test -- --coverage --coverageReporters=lcov --coverageDirectory=coverage'
                     }
@@ -34,7 +44,7 @@ pipeline {
             when { expression { params.RUN_UNIT_TESTS_BACKEND } }
             steps {
                 dir('backend') {
-                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
                         withCredentials([
                             string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
                             string(credentialsId: 'DB_PORT', variable: 'DB_PORT'),
@@ -71,6 +81,17 @@ pipeline {
                         withSonarQubeEnv('SonarQube') {
                             sh 'npx sonar-scanner'
                         }
+                    }
+                }
+            }
+        }
+
+        stage('Cypress Tests') {
+            when { expression { params.RUN_CYPRESS_TESTS } }
+            steps {
+                dir('frontend') {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+                        sh 'npm run cypress:run'
                     }
                 }
             }

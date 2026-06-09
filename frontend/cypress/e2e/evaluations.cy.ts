@@ -1,11 +1,4 @@
-/**
- * E2E Tests - Evaluaciones Heurísticas
- * Ruta real (Next.js): /evaluacion/[id]?project_id=X&evaluation_id=Y
- */
-
 export { };
-
-// ─── Fixtures ────────────────────────────────────────────────────────────────
 
 const PLANTILLA_ID = 1;
 const EVALUATION_ID = 42;
@@ -16,12 +9,6 @@ const fakeUser = { id: USER_ID, nombre: "Tester", email: "tester@test.com", rol:
 
 const projectsFixture = [{ id: PROJECT_ID, nombre: "Proyecto Test" }];
 
-/**
- * Fixture completo con los campos que EvaluationForm necesita:
- * - tipo_respuesta → usado en pregunta.tipo_respuesta.startsWith('likert')
- * - opciones       → usado en pregunta.opciones.map(...)
- * - descripcion    → usado en plantilla.descripcion
- */
 const plantillaEstructuraFixture = {
     id: PLANTILLA_ID,
     nombre: "Evaluación Heurística Nielsen",
@@ -84,18 +71,12 @@ const progressFixture = {
     updated_at: "2024-11-01T10:00:00Z",
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const evalUrl = (plantillaId: number, projectId: number, evaluationId?: number) => {
     const base = `/evaluacion/${plantillaId}?project_id=${projectId}`;
     return evaluationId !== undefined ? `${base}&evaluation_id=${evaluationId}` : base;
 };
 
-/**
- * Visita inyectando auth en localStorage ANTES de que Next.js ejecute código.
- * - 'token' → interceptor Axios (api.ts)
- * - 'user'  → authService.getCurrentUser() y Sidebar
- */
 const visitWithAuth = (url: string) => {
     cy.visit(url, {
         failOnStatusCode: false,
@@ -106,17 +87,9 @@ const visitWithAuth = (url: string) => {
     });
 };
 
-/**
- * El Sidebar en RootLayout llama a GET /projects/ en cada render.
- * Sin este mock recibe 401 y puede interrumpir la carga de la página.
- */
 const mockSidebarProjects = () => {
     cy.intercept("GET", "**/projects/**", { statusCode: 200, body: projectsFixture }).as("sidebarProjects");
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 1. GET /plantillas/:id/estructura  →  get_estructura
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe("API: GET /plantillas/:id/estructura", () => {
     beforeEach(() => {
@@ -157,17 +130,12 @@ describe("API: GET /plantillas/:id/estructura", () => {
         visitWithAuth(evalUrl(PLANTILLA_ID, PROJECT_ID));
         cy.wait("@getEstructura");
 
-        // data-cy^= matches all inputs regardless of suffix (respuesta-input-101, -102, -201)
         cy.get("[data-cy^='respuesta-input-']").should("have.length", 3);
         cy.get("[data-cy^='respuesta-input-']").each(($el) => {
             cy.wrap($el).should("have.value", "");
         });
     });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 2. GET /evaluaciones/progress/:id  →  get_progress
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe("API: GET /evaluaciones/progress/:id", () => {
     beforeEach(() => {
@@ -219,10 +187,6 @@ describe("API: GET /evaluaciones/progress/:id", () => {
     });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 3. Hook: loadPlantilla (useEvaluation)
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe("Hook: loadPlantilla", () => {
     beforeEach(() => {
         mockSidebarProjects();
@@ -255,7 +219,6 @@ describe("Hook: loadPlantilla", () => {
         cy.wait("@getEstructura");
         cy.wait("@getProgress");
 
-        // Pregunta 101 (likert) tiene valor_numerico: 3 guardado → hidden input refleja "3"
         cy.get("[data-cy=respuesta-input-101]").should("have.value", "3");
         // Pregunta 102 sin respuesta → vacío
         cy.get("[data-cy=respuesta-input-102]").should("have.value", "");
@@ -273,10 +236,6 @@ describe("Hook: loadPlantilla", () => {
         cy.get("[data-cy=error-message]").should("be.visible");
     });
 });
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 4. Service: get_progreso — testeado vía endpoint
-// ─────────────────────────────────────────────────────────────────────────────
 
 describe("Service: get_progreso via /evaluaciones/progress/:id", () => {
     beforeEach(() => {
@@ -331,5 +290,181 @@ describe("Service: get_progreso via /evaluaciones/progress/:id", () => {
 
         cy.get("[data-cy=error-message]")
             .should("be.visible");
+    });
+});
+
+describe("Motor de ejecucion de evaluaciones heuristicas", () => {
+    type EvaluationRequestAnswer = {
+        pregunta_id: number;
+        valor_numerico?: number;
+        opcion_id?: number;
+        comentario?: string;
+    };
+
+    beforeEach(() => {
+        mockSidebarProjects();
+        cy.intercept("GET", `**/plantillas/${PLANTILLA_ID}/estructura`, {
+            statusCode: 200,
+            body: plantillaEstructuraFixture,
+        }).as("getEstructura");
+    });
+
+    const answerFirstLikert = (value: number) => {
+        cy.get("[data-cy=respuesta-input-101]").parent().within(() => {
+            cy.contains("span", String(value)).click();
+        });
+    };
+
+    const answerSecondLikert = (value: number) => {
+        cy.get("[data-cy=respuesta-input-102]").parent().within(() => {
+            cy.contains("span", String(value)).click();
+        });
+    };
+
+    const answerSelection = (label: string) => {
+        cy.get("[data-cy=respuesta-input-201]").parent().within(() => {
+            cy.contains(label).click();
+        });
+    };
+
+    const answerAllQuestions = () => {
+        answerFirstLikert(4);
+        answerSecondLikert(5);
+        answerSelection("siempre");
+    };
+
+    it("crea una evaluacion nueva y registra respuestas en la UI", () => {
+        cy.intercept("PATCH", "**/evaluaciones/progress", {
+            statusCode: 200,
+            body: { id: EVALUATION_ID, estado: "borrador" },
+        }).as("saveProgress");
+
+        visitWithAuth(evalUrl(PLANTILLA_ID, PROJECT_ID));
+        cy.wait("@getEstructura");
+
+        answerFirstLikert(4);
+        answerSelection("siempre");
+
+        cy.get("[data-cy=respuesta-input-101]").should("have.value", "4");
+        cy.get("[data-cy=respuesta-input-201]").should("have.value", "1");
+        cy.get("[data-cy=progress-count]").should("contain", "2 / 3");
+        cy.get("[data-cy=progress-bar]").should("have.attr", "aria-valuenow", "67");
+    });
+
+    it("guarda un borrador incompleto exitosamente", () => {
+        cy.intercept("PATCH", "**/evaluaciones/progress", (req) => {
+            const respuestas = req.body.respuestas as EvaluationRequestAnswer[];
+
+            expect(req.body.evaluation_id).to.eq(undefined);
+            expect(req.body.plantilla_id).to.eq(PLANTILLA_ID);
+            expect(req.body.proyecto_id).to.eq(PROJECT_ID);
+            expect(req.body.evaluador_id).to.eq(USER_ID);
+            expect(respuestas).to.have.length(3);
+            expect(respuestas.find((respuesta) => respuesta.pregunta_id === 101)?.valor_numerico).to.eq(3);
+
+            req.reply({
+                statusCode: 200,
+                body: { id: EVALUATION_ID, estado: "borrador" },
+            });
+        }).as("saveProgress");
+
+        visitWithAuth(evalUrl(PLANTILLA_ID, PROJECT_ID));
+        cy.wait("@getEstructura");
+
+        answerFirstLikert(3);
+        cy.contains("button", "Guardar progreso").click();
+
+        cy.wait("@saveProgress").its("response.statusCode").should("eq", 200);
+        cy.contains("Progreso guardado").should("be.visible");
+        cy.get("[data-cy=progress-count]").should("contain", "1 / 3");
+    });
+
+    it("recupera un borrador guardado y permite continuar la evaluacion", () => {
+        cy.intercept("GET", `**/evaluaciones/progress/${EVALUATION_ID}`, {
+            statusCode: 200,
+            body: progressFixture,
+        }).as("getProgress");
+
+        cy.intercept("PATCH", "**/evaluaciones/progress", {
+            statusCode: 200,
+            body: { id: EVALUATION_ID, estado: "borrador" },
+        }).as("saveProgress");
+
+        visitWithAuth(evalUrl(PLANTILLA_ID, PROJECT_ID, EVALUATION_ID));
+        cy.wait("@getEstructura");
+        cy.wait("@getProgress");
+
+        cy.get("[data-cy=respuesta-input-101]").should("have.value", "3");
+        cy.get("[data-cy=respuesta-input-201]").should("have.value", "1");
+
+        answerSecondLikert(5);
+
+        cy.get("[data-cy=respuesta-input-102]").should("have.value", "5");
+        cy.get("[data-cy=progress-count]").should("contain", "3 / 3");
+        cy.get("[data-cy=progress-bar]").should("have.attr", "aria-valuenow", "100");
+    });
+
+    it("envia una evaluacion completa exitosamente", () => {
+        cy.intercept("PATCH", "**/evaluaciones/progress", {
+            statusCode: 200,
+            body: { id: EVALUATION_ID, estado: "borrador" },
+        }).as("saveProgress");
+
+        cy.intercept("POST", "**/evaluaciones/", (req) => {
+            const respuestas = req.body.respuestas as EvaluationRequestAnswer[];
+
+            expect(req.body.plantilla_id).to.eq(PLANTILLA_ID);
+            expect(req.body.proyecto_id).to.eq(PROJECT_ID);
+            expect(req.body.evaluador_id).to.eq(USER_ID);
+            expect(respuestas).to.have.length(3);
+            expect(respuestas.every((respuesta) => (
+                respuesta.valor_numerico !== undefined ||
+                respuesta.opcion_id !== undefined ||
+                Boolean(respuesta.comentario)
+            ))).to.eq(true);
+
+            req.reply({
+                statusCode: 200,
+                body: { id: 123, estado: "completada", progress_percentage: 100 },
+            });
+        }).as("submitEvaluacion");
+
+        cy.on("window:alert", (message) => {
+            expect(message).to.contain("enviada");
+        });
+
+        visitWithAuth(evalUrl(PLANTILLA_ID, PROJECT_ID));
+        cy.wait("@getEstructura");
+
+        answerAllQuestions();
+        cy.get("[data-cy=progress-count]").should("contain", "3 / 3");
+        cy.get("[data-cy=progress-bar]").should("have.attr", "aria-valuenow", "100");
+
+        cy.contains("button", "Finalizar Evaluaci").click();
+
+        cy.wait("@submitEvaluacion").its("response.statusCode").should("eq", 200);
+        cy.location("pathname").should("eq", `/project/${PROJECT_ID}/evaluations`);
+    });
+
+    it("muestra error del backend al enviar la evaluacion", () => {
+        cy.intercept("PATCH", "**/evaluaciones/progress", {
+            statusCode: 200,
+            body: { id: EVALUATION_ID, estado: "borrador" },
+        }).as("saveProgress");
+
+        cy.intercept("POST", "**/evaluaciones/", {
+            statusCode: 400,
+            body: { detail: "No se pudo registrar la evaluacion" },
+        }).as("submitEvaluacionError");
+
+        visitWithAuth(evalUrl(PLANTILLA_ID, PROJECT_ID));
+        cy.wait("@getEstructura");
+
+        answerAllQuestions();
+        cy.contains("button", "Finalizar Evaluaci").click();
+
+        cy.wait("@submitEvaluacionError").its("response.statusCode").should("eq", 400);
+        cy.get("[data-cy=error-message]").should("be.visible");
+        cy.location("pathname").should("eq", `/evaluacion/${PLANTILLA_ID}`);
     });
 });

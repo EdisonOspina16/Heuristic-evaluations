@@ -2,6 +2,7 @@
 .venv/
 backend/venv/
 .env
+.env/
 __pycache__
 coverage.xml
 package-lock.json
@@ -11,4 +12,3 @@ sonar-project.properties
 .coverage
 .scannerwork/report-task.txt
 .sonar/report-task.txt
-

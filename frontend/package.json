@@ -21,7 +21,10 @@
     "test:deepeval:rag": "cd deepeval_heuristic && python -m pytest test_rag_evaluation.py -v",
     "lighthouse:public": "esbuild src/lighthouse/run-audits.ts --bundle --platform=node --format=cjs --external:lighthouse --external:chrome-launcher --external:playwright --outfile=dist/lighthouse/run-audits.cjs && node dist/lighthouse/run-audits.cjs",
     "lighthouse:protected": "esbuild src/lighthouse/run-protected.ts --bundle --platform=node --format=cjs --external:lighthouse --external:chrome-launcher --external:playwright --external:puppeteer --outfile=dist/lighthouse/run-protected.cjs && node dist/lighthouse/run-protected.cjs",
-    "lighthouse:all": "npm run lighthouse:public && npm run lighthouse:protected"
+    "lighthouse:all": "npm run lighthouse:public && npm run lighthouse:protected",
+    "test:bdd": "TS_NODE_PROJECT=tests/bdd/support/tsconfig.bdd.json TS_NODE_TRANSPILE_ONLY=true TS_NODE_FILES=true node --require ts-node/register node_modules/.bin/cucumber-js --require tests/bdd/support/world.ts --require tests/bdd/support/hooks.ts --require 'tests/bdd/steps/**/*.ts' --format progress-bar 'tests/bdd/features/**/*.feature'",
+    "test:bdd:watch": "cucumber-js --config cucumber.config.ts --watch",
+    "test:bdd:report": "serenity-bdd run --features src/tests-bdd/features"
   },
   "dependencies": {
     "axios": "^1.15.2",
@@ -36,7 +39,13 @@
   },
   "devDependencies": {
     "@browserbasehq/stagehand": "^3.5.0",
+    "@cucumber/cucumber": "^12.9.0",
     "@playwright/test": "^1.60.0",
+    "@serenity-js/assertions": "^3.43.3",
+    "@serenity-js/core": "^3.43.3",
+    "@serenity-js/cucumber": "^3.43.3",
+    "@serenity-js/playwright": "^3.43.3",
+    "@serenity-js/web": "^3.43.3",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -49,6 +58,7 @@
     "chai": "^4.3.8",
     "chrome-launcher": "^1.2.1",
     "chromium": "^3.0.3",
+    "cucumber": "^6.0.7",
     "cypress": "^15.16.0",
     "cypress-axe": "^1.7.0",
     "dotenv": "^17.4.2",

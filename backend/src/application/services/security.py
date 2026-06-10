@@ -13,6 +13,8 @@ from src.application.services.auth_service import (
     InactiveUserError,
 )
 
+from src.application.services.init_service import assign_admin_if_first_user
+
 SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")
 ALGORITHM = "HS256"
 
@@ -43,9 +45,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=400, detail="Inactive user")
 
     # Auto-repair: If user has no roles and is the first user, assign ADMIN
-    from src.application.services.init_service import assign_admin_if_first_user
     assign_admin_if_first_user(user_repo, role_repo, user)
-
     return user
 
 

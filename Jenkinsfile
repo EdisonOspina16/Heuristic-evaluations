@@ -11,6 +11,11 @@ pipeline {
         booleanParam(name: 'RUN_UNIT_TESTS_FRONTEND', defaultValue: true, description: 'Frontend tests')
         booleanParam(name: 'RUN_UNIT_TESTS_BACKEND', defaultValue: true, description: 'Backend tests')
         booleanParam(name: 'RUN_CYPRESS_TESTS', defaultValue: true, description: 'Cypress tests')
+        booleanParam(name: 'RUN_SECURITY_TESTS', defaultValue: true, description: 'Ejecutar analisis de seguridad en backend y frontend')
+        booleanParam(name: 'RUN_API_TESTS', defaultValue: true, description: 'Ejecutar analisis de API backend')
+        booleanParam(name: 'RUN_PERFORMANCE_TESTS', defaultValue: true, description: 'Ejecutar analisis de rendimiento en backend (locust) y frontend (lighthouse)')
+        booleanParam(name: 'RUN_REGRESSION_TESTS', defaultValue: true, description: 'Ejecutar analisis de regresion en backend y frontend')
+
     }
 
     tools {
@@ -34,7 +39,7 @@ pipeline {
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
                         sh 'npm install'
-                        sh 'npm test -- --coverage --coverageReporters=lcov --coverageDirectory=coverage'
+                        sh 'npm test --tests/unit --coverage --coverageReporters=lcov --coverageDirectory=coverage'
                     }
                 }
             }
@@ -58,7 +63,7 @@ pipeline {
                                 . venv/bin/activate
                                 pip install --upgrade pip
                                 pip install -r requirements.txt
-                                pytest --cov=src --cov-report=xml:coverage.xml
+                                pytest tests/unit_test --cov=src --cov-report=xml:coverage.xml
                             '''
                         }
                     }
@@ -80,6 +85,58 @@ pipeline {
                     dir('frontend') {
                         withSonarQubeEnv('SonarQube') {
                             sh 'npx sonar-scanner'
+                        }
+                    }
+                }
+            }
+        }
+
+        
+        stage('Backend Security Tests') {
+            when { expression { params.RUN_SECURITY_TESTS } }
+            steps {
+                dir('backend') {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+                        withCredentials([
+                            string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
+                            string(credentialsId: 'DB_PORT', variable: 'DB_PORT'),
+                            string(credentialsId: 'DB_NAME', variable: 'DB_NAME'),
+                            string(credentialsId: 'DB_USER', variable: 'DB_USER'),
+                            string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                            string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')
+                        ]) {
+                            sh '''
+                                . venv/bin/activate
+                                pytest tests/security
+                            '''
+                        }
+                    }
+                }
+                dir('frontend') {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+                        sh 'npm test --tests/security'
+                    }
+                }
+            }
+        }
+        
+        stage('Backend API Tests') {
+            when { expression { params.RUN_API_TESTS } }
+            steps {
+                dir('backend') {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+                        withCredentials([
+                            string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
+                            string(credentialsId: 'DB_PORT', variable: 'DB_PORT'),
+                            string(credentialsId: 'DB_NAME', variable: 'DB_NAME'),
+                            string(credentialsId: 'DB_USER', variable: 'DB_USER'),
+                            string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                            string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')
+                        ]) {
+                            sh '''
+                                . venv/bin/activate
+                                pytest tests/api
+                            '''
                         }
                     }
                 }

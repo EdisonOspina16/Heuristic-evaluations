@@ -32,6 +32,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
 
     user_repo = SQLAlchemyUserRepository(db)
+    role_repo = SQLAlchemyRoleRepository(db)
     auth_service = AuthenticationService(user_repo, SECRET_KEY, ALGORITHM)
 
     try:
@@ -40,6 +41,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
     except InactiveUserError:
         raise HTTPException(status_code=400, detail="Inactive user")
+
+    # Auto-repair: If user has no roles and is the first user, assign ADMIN
+    from src.application.services.init_service import assign_admin_if_first_user
+    assign_admin_if_first_user(user_repo, role_repo, user)
 
     return user
 

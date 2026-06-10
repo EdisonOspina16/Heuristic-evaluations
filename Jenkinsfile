@@ -14,7 +14,7 @@ pipeline {
         booleanParam(name: 'RUN_SECURITY_TESTS', defaultValue: true, description: 'Ejecutar analisis de seguridad en backend y frontend')
         booleanParam(name: 'RUN_API_TESTS', defaultValue: true, description: 'Ejecutar analisis de API backend')
         booleanParam(name: 'RUN_PERFORMANCE_LOCUST', defaultValue: true, description: 'Ejecutar analisis de rendimiento de backend (locust)')
-        booleanParam(name: 'RUN_PERFORMANCE_LIGHTHOUSE': defaultValue:true, description:'Ejecutar analisis de performance del frontend(lighthouse)')
+        booleanParam(name: 'RUN_LIGHTHOUSE': defaultValue:true, description:'Ejecutar analisis de performance del frontend(lighthouse)')
         booleanParam(name: 'RUN_REGRESSION_TESTS', defaultValue: true, description: 'Ejecutar analisis de regresion en backend y frontend')
 
     }
@@ -180,7 +180,7 @@ pipeline {
             }
         }
         stage('Frontend Performance Tests') {
-            when { expression { params.RUN_PERFORMANCE_LIGHTHOUSE } }
+            when { expression { params.RUN_LIGHTHOUSE } }
             steps {
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {

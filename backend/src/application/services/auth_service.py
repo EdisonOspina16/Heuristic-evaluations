@@ -1,8 +1,15 @@
+import os
 from typing import Any
-import jwt
 
 from src.domain.repositories import UserRepository
+from datetime import datetime, timedelta
+from passlib.context import CryptContext
 
+import jwt
+
+SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
 
 class AuthenticationError(Exception):
     pass
@@ -53,14 +60,7 @@ class PermissionService:
             user_permissions.add(getattr(perm, "code", None))
 
         return required_permission in user_permissions
-from datetime import datetime, timedelta
-from passlib.context import CryptContext
-import jwt
-import os
 
-SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

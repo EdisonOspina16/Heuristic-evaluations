@@ -1,11 +1,66 @@
+import os
+from typing import Any
+
+from src.domain.repositories import UserRepository
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
+
 import jwt
-import os
 
 SECRET_KEY = os.getenv("SECRET_KEY", "supersecretkey")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
+
+class AuthenticationError(Exception):
+    pass
+
+
+class InactiveUserError(Exception):
+    pass
+
+
+class AuthenticationService:
+    def __init__(self, user_repository: UserRepository, secret_key: str, algorithm: str):
+        self.user_repository = user_repository
+        self.secret_key = secret_key
+        self.algorithm = algorithm
+
+    def authenticate_token(self, token: str) -> Any:
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            email: str = payload.get("sub")
+            if email is None:
+                raise AuthenticationError("Could not validate credentials")
+        except jwt.PyJWTError:
+            raise AuthenticationError("Could not validate credentials")
+
+        user = self.user_repository.get_by_email(email)
+        if user is None:
+            raise AuthenticationError("Could not validate credentials")
+
+        if not getattr(user, "active", True):
+            raise InactiveUserError("Inactive user")
+
+        return user
+
+
+class PermissionService:
+    def has_permission(self, user: Any, required_permission: str) -> bool:
+        # Admin shortcut
+        for role in getattr(user, "roles", []):
+            if getattr(role, "name", None) == "ADMIN":
+                return True
+
+        user_permissions = set()
+        for role in getattr(user, "roles", []):
+            for perm in getattr(role, "permissions", []):
+                user_permissions.add(getattr(perm, "code", None))
+
+        for perm in getattr(user, "direct_permissions", []):
+            user_permissions.add(getattr(perm, "code", None))
+
+        return required_permission in user_permissions
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

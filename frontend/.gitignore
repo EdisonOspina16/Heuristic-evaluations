@@ -47,3 +47,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Python
+__pycache__/
+*.pyc
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+
+# DeepEval
+deepeval_heuristic/.deepeval/
+deepeval_heuristic/outputs/
+
+# Test auth cache
+tests-AI/.auth-cache.json

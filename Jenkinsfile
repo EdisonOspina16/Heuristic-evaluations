@@ -173,8 +173,8 @@ pipeline {
                     BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}"  evaluacion-heuristicas-backend-1)
                     echo "Frontend IP: $FRONTEND_IP"
                     echo "Backend IP: $BACKEND_IP"
-                    curl --retry 30 --retry-delay 2 --retry-connrefused http://$FRONTEND_IP:3000
-                    curl --retry 30 --retry-delay 2 --retry-connrefused http://$BACKEND_IP:8000
+                    curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:3000
+                    curl --retry 30 --retry-delay 2 --retry-connrefused http://localhost:8000
                     '''
                 }
             }

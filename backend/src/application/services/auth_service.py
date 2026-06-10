@@ -1,3 +1,58 @@
+from typing import Any
+import jwt
+
+from src.domain.repositories import UserRepository
+
+
+class AuthenticationError(Exception):
+    pass
+
+
+class InactiveUserError(Exception):
+    pass
+
+
+class AuthenticationService:
+    def __init__(self, user_repository: UserRepository, secret_key: str, algorithm: str):
+        self.user_repository = user_repository
+        self.secret_key = secret_key
+        self.algorithm = algorithm
+
+    def authenticate_token(self, token: str) -> Any:
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            email: str = payload.get("sub")
+            if email is None:
+                raise AuthenticationError("Could not validate credentials")
+        except jwt.PyJWTError:
+            raise AuthenticationError("Could not validate credentials")
+
+        user = self.user_repository.get_by_email(email)
+        if user is None:
+            raise AuthenticationError("Could not validate credentials")
+
+        if not getattr(user, "active", True):
+            raise InactiveUserError("Inactive user")
+
+        return user
+
+
+class PermissionService:
+    def has_permission(self, user: Any, required_permission: str) -> bool:
+        # Admin shortcut
+        for role in getattr(user, "roles", []):
+            if getattr(role, "name", None) == "ADMIN":
+                return True
+
+        user_permissions = set()
+        for role in getattr(user, "roles", []):
+            for perm in getattr(role, "permissions", []):
+                user_permissions.add(getattr(perm, "code", None))
+
+        for perm in getattr(user, "direct_permissions", []):
+            user_permissions.add(getattr(perm, "code", None))
+
+        return required_permission in user_permissions
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 import jwt

@@ -13,3 +13,5 @@ httpx2
 pysonar
 locust
 PyHamcrest
+bandit
+pip-audit

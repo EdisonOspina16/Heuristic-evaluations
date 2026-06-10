@@ -210,12 +210,12 @@ pipeline {
 
             steps {
                 echo '''
-                    ____  _             _     _____ ____  _____   _____            _                                      _   
-                    / ___|| |_ __ _ _ __| |_  | ____|___ \\| ____| | ____|_ ____   _(_)_ __ ___  _ __  _ __ ___   ___ _ __ | |_ 
-                    \\___ \\| __/ _` | '__| __| |  _|   __) |  _|   |  _| | '_ \\ \\ / / | '__/ _ \\| '_ \\| '_ ` _ \\ / _ \\ '_ \\| __|
-                    ___) | || (_| | |  | |_  | |___ / __/| |___  | |___| | | \\ V /| | | | (_) | | | | | | | | |  __/ | | | |_ 
-                    |____/ \\__\\__,_|_|   \\__| |_____|_____|_____| |_____|_| |_|\\_/ |_|_|  \\___/|_| |_|_| |_| |_|\\___|_| |_|\\__|
-                    '''
+                ____  _             _     _____ ____  _____   _____            _                                      _   
+                / ___|| |_ __ _ _ __| |_  | ____|___ \\| ____| | ____|_ ____   _(_)_ __ ___  _ __  _ __ ___   ___ _ __ | |_ 
+                \\___ \\| __/ _` | '__| __| |  _|   __) |  _|   |  _| | '_ \\ \\ / / | '__/ _ \\| '_ \\| '_ ` _ \\ / _ \\ '_ \\| __|
+                ___) | || (_| | |  | |_  | |___ / __/| |___  | |___| | | \\ V /| | | | (_) | | | | | | | | |  __/ | | | |_ 
+                |____/ \\__\\__,_|_|   \\__| |_____|_____|_____| |_____|_| |_|\\_/ |_|_|  \\___/|_| |_|_| |_| |_|\\___|_| |_|\\__|
+                '''
                 withCredentials([
                     string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')
                 ]) {
@@ -228,8 +228,8 @@ pipeline {
                     '''
 
                     sh '''
-                    FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
-                    BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}"  evaluacion-heuristicas-backend-1)
+                    FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
+                    BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}"  heuristic-evaluations-pipeline-backend-1)
                     echo "Frontend IP: $FRONTEND_IP"
                     echo "Backend IP: $BACKEND_IP"
                     curl --retry 30 --retry-delay 2 --retry-connrefused http://$FRONTEND_IP:3000
@@ -242,12 +242,12 @@ pipeline {
             when { expression { params.RUN_LIGHTHOUSE } }
             steps {
                 echo '''
-                    _____                _                 _   ____            __                                            _____         _       
-                    |  ___| __ ___  _ __ | |_ ___ _ __   __| | |  _ \\ ___ _ __ / _| ___  _ __ _ __ ___   __ _ _ __   ___ ___  |_   _|__  ___| |_ ___ 
-                    | |_ | '__/ _ \\| '_ \\| __/ _ \\ '_ \\ / _` | | |_) / _ \\ '__| |_ / _ \\| '__| '_ ` _ \\ / _` | '_ \\ / __/ _ \\   | |/ _ \\/ __| __/ __|
-                    |  _|| | | (_) | | | | ||  __/ | | | (_| | |  __/  __/ |  |  _| (_) | |  | | | | | | (_| | | | | (_|  __/   | |  __/\\__ \\ |_\\__ \\
-                    |_|  |_|  \\___/|_| |_|\\__\\___|_| |_|\\__,_| |_|   \\___|_|  |_|  \\___/|_|  |_| |_| |_|\\__,_|_| |_|\\___\\___|   |_|\\___||___/\\__|___/
-                    '''
+                _____                _                 _   ____            __                                            _____         _       
+                |  ___| __ ___  _ __ | |_ ___ _ __   __| | |  _ \\ ___ _ __ / _| ___  _ __ _ __ ___   __ _ _ __   ___ ___  |_   _|__  ___| |_ ___ 
+                | |_ | '__/ _ \\| '_ \\| __/ _ \\ '_ \\ / _` | | |_) / _ \\ '__| |_ / _ \\| '__| '_ ` _ \\ / _` | '_ \\ / __/ _ \\   | |/ _ \\/ __| __/ __|
+                |  _|| | | (_) | | | | ||  __/ | | | (_| | |  __/  __/ |  |  _| (_) | |  | | | | | | (_| | | | | (_|  __/   | |  __/\\__ \\ |_\\__ \\
+                |_|  |_|  \\___/|_| |_|\\__\\___|_| |_|\\__,_| |_|   \\___|_|  |_|  \\___/|_|  |_| |_| |_|\\__,_|_| |_|\\___\\___|   |_|\\___||___/\\__|___/
+                '''
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
                         withCredentials([
@@ -255,7 +255,7 @@ pipeline {
                             string(credentialsId: 'LIGHTHOUSE_PASSWORD', variable: 'LIGHTHOUSE_PASSWORD')
                         ]) {
                             sh '''
-                                FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
+                                FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
 
                                 NEXT_PUBLIC_BASE_URL=http://$FRONTEND_IP:3000 \
                                 LIGHTHOUSE_EMAIL=$LIGHTHOUSE_EMAIL \
@@ -290,7 +290,7 @@ pipeline {
                             string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')
                         ]) {
                             sh '''
-                                BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-backend-1)
+                                BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
 
                                 . venv/bin/activate
 
@@ -322,21 +322,21 @@ pipeline {
             when { expression { params.RUN_CYPRESS_TESTS } }
             steps {
                 echo '''
-                    ____                                _____         _       
-                    / ___|   _ _ __  _ __ ___  ___ ___  |_   _|__  ___| |_ ___ 
-                    | |  | | | | '_ \\| '__/ _ \\/ __/ __|   | |/ _ \\/ __| __/ __|
-                    | |__| |_| | |_) | | |  __/\\__ \\__ \\   | |  __/\\__ \\ |_\\__ \\
-                    \\____\\__, | .__/|_|  \\___||___/___/   |_|\\___||___/\\__|___/
-                        |___/|_|                                              
-                    '''
+                ____                                _____         _       
+                / ___|   _ _ __  _ __ ___  ___ ___  |_   _|__  ___| |_ ___ 
+                | |  | | | | '_ \\| '__/ _ \\/ __/ __|   | |/ _ \\/ __| __/ __|
+                | |__| |_| | |_) | | |  __/\\__ \\__ \\   | |  __/\\__ \\ |_\\__ \\
+                \\____\\__, | .__/|_|  \\___||___/___/   |_|\\___||___/\\__|___/
+                    |___/|_|                                              
+                '''
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
                         sh 'npm ci'
                         sh 'npx cypress install'
                         sh 'npx cypress verify'
                         sh '''
-                            FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
-                            BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-backend-1)
+                            FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
+                            BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
                             CYPRESS_BASE_URL=http://$FRONTEND_IP:3000 CYPRESS_API_URL=http://$BACKEND_IP:8000 npm run cypress:run
                         '''
                     }

@@ -169,8 +169,8 @@ pipeline {
                     '''
 
                     sh '''
-                    FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
-                    BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
+                    FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
+                    BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}"  evaluacion-heuristicas-backend-1)
                     echo "Frontend IP: $FRONTEND_IP"
                     echo "Backend IP: $BACKEND_IP"
                     curl --retry 30 --retry-delay 2 --retry-connrefused http://$FRONTEND_IP:3000
@@ -189,7 +189,7 @@ pipeline {
                             string(credentialsId: 'LIGHTHOUSE_PASSWORD', variable: 'LIGHTHOUSE_PASSWORD')
                         ]) {
                             sh '''
-                                FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
+                                FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
 
                                 NEXT_PUBLIC_BASE_URL=http://$FRONTEND_IP:3000 \
                                 LIGHTHOUSE_EMAIL=$LIGHTHOUSE_EMAIL \
@@ -217,7 +217,7 @@ pipeline {
                             string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')
                         ]) {
                             sh '''
-                                BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
+                                BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-backend-1)
 
                                 . venv/bin/activate
 
@@ -254,8 +254,8 @@ pipeline {
                         sh 'npx cypress install'
                         sh 'npx cypress verify'
                         sh '''
-                            FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
-                            BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
+                            FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
+                            BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-backend-1)
                             CYPRESS_BASE_URL=http://$FRONTEND_IP:3000 CYPRESS_API_URL=http://$BACKEND_IP:8000 npm run cypress:run
                         '''
                     }

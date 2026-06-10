@@ -206,6 +206,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </Link>
               <button
                 onClick={handleLogout}
+                data-testid="sidebar-logout-button"
                 className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors"
               >
                 <LogOut className="w-4 h-4" />
@@ -216,6 +217,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </AnimatePresence>
 
         <div 
+          data-testid="sidebar-user-toggle"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group"
         >

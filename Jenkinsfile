@@ -13,7 +13,8 @@ pipeline {
         booleanParam(name: 'RUN_CYPRESS_TESTS', defaultValue: true, description: 'Cypress tests')
         booleanParam(name: 'RUN_SECURITY_TESTS', defaultValue: true, description: 'Ejecutar analisis de seguridad en backend y frontend')
         booleanParam(name: 'RUN_API_TESTS', defaultValue: true, description: 'Ejecutar analisis de API backend')
-        booleanParam(name: 'RUN_PERFORMANCE_TESTS', defaultValue: true, description: 'Ejecutar analisis de rendimiento en backend (locust) y frontend (lighthouse)')
+        booleanParam(name: 'RUN_PERFORMANCE_LOCUST', defaultValue: true, description: 'Ejecutar analisis de rendimiento de backend (locust)')
+        booleanParam(name: 'RUN_LIGHTHOUSE', defaultValue:true, description:'Ejecutar analisis de performance del frontend(lighthouse)')
         booleanParam(name: 'RUN_REGRESSION_TESTS', defaultValue: true, description: 'Ejecutar analisis de regresion en backend y frontend')
 
     }
@@ -114,7 +115,7 @@ pipeline {
                 }
                 dir('frontend') {
                     catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
-                        sh 'npm test --tests/security'
+                        sh 'npm test -- tests/security/frontend_dependency_audit.test.ts'
                     }
                 }
             }
@@ -168,13 +169,78 @@ pipeline {
                     '''
 
                     sh '''
-                    FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
-                    BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
+                    FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
+                    BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}"  evaluacion-heuristicas-backend-1)
                     echo "Frontend IP: $FRONTEND_IP"
                     echo "Backend IP: $BACKEND_IP"
                     curl --retry 30 --retry-delay 2 --retry-connrefused http://$FRONTEND_IP:3000
                     curl --retry 30 --retry-delay 2 --retry-connrefused http://$BACKEND_IP:8000
                     '''
+                }
+            }
+        }
+        stage('Frontend Performance Tests') {
+            when { expression { params.RUN_LIGHTHOUSE } }
+            steps {
+                dir('frontend') {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+                        withCredentials([
+                            string(credentialsId: 'LIGHTHOUSE_EMAIL', variable: 'LIGHTHOUSE_EMAIL'),
+                            string(credentialsId: 'LIGHTHOUSE_PASSWORD', variable: 'LIGHTHOUSE_PASSWORD')
+                        ]) {
+                            sh '''
+                                FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
+
+                                NEXT_PUBLIC_BASE_URL=http://$FRONTEND_IP:3000 \
+                                LIGHTHOUSE_EMAIL=$LIGHTHOUSE_EMAIL \
+                                LIGHTHOUSE_PASSWORD=$LIGHTHOUSE_PASSWORD \
+                                node src/lighthouse/run-protected.js
+                            '''
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'frontend/src/lighthouse/reports/*.html',
+                                    allowEmptyArchive: true
+                }
+            }
+        }
+
+        stage('Backend Performance Tests') {
+            when { expression { params.RUN_PERFORMANCE_LOCUST } }
+            steps {
+                dir('backend') {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'SUCCESS') {
+                        withCredentials([
+                            string(credentialsId: 'DATABASE_URL', variable: 'DATABASE_URL')
+                        ]) {
+                            sh '''
+                                BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-backend-1)
+
+                                . venv/bin/activate
+
+                                mkdir -p tests/performance/reports
+
+                                for f in tests/performance/locustfile_*.py; do
+                                    name=$(basename $f .py)
+                                    echo "Running $name..."
+                                    locust -f $f \
+                                        --headless --host=http://$BACKEND_IP:8000 \
+                                        --users=10 --spawn-rate=2 --run-time=30s \
+                                        --html=tests/performance/reports/${name}.html \
+                                        --csv=tests/performance/reports/${name}
+                                done
+                            '''
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'backend/tests/performance/reports/*.html,backend/tests/performance/reports/*.csv',
+                                    allowEmptyArchive: true
                 }
             }
         }
@@ -188,8 +254,8 @@ pipeline {
                         sh 'npx cypress install'
                         sh 'npx cypress verify'
                         sh '''
-                            FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-frontend-1)
-                            BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" heuristic-evaluations-pipeline-backend-1)
+                            FRONTEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-frontend-1)
+                            BACKEND_IP=$(docker inspect -f "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}" evaluacion-heuristicas-backend-1)
                             CYPRESS_BASE_URL=http://$FRONTEND_IP:3000 CYPRESS_API_URL=http://$BACKEND_IP:8000 npm run cypress:run
                         '''
                     }

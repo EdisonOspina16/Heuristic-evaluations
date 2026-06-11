@@ -260,7 +260,7 @@ pipeline {
                                 NEXT_PUBLIC_BASE_URL=http://$FRONTEND_IP:3000 \
                                 LIGHTHOUSE_EMAIL=$LIGHTHOUSE_EMAIL \
                                 LIGHTHOUSE_PASSWORD=$LIGHTHOUSE_PASSWORD \
-                                node src/lighthouse/run-protected.js
+                                npm run lighthouse:all
                             '''
                         }
                     }

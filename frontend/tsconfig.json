@@ -38,6 +38,7 @@
 , "cucumber.config.js"  ],
   "exclude": [
     "node_modules",
-    "**/*.feature"
+    "**/*.feature",
+    "tests/bdd"
   ]
 }

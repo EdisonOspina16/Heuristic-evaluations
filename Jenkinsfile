@@ -206,8 +206,6 @@ pipeline {
         }
 
         stage('Start E2E Environment') {
-            when { expression { params.RUN_CYPRESS_TESTS } }
-
             steps {
                 echo '''
  ____  _             _     _____ ____  _____   _____            _                                      _   

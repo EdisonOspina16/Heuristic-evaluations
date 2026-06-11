@@ -23,6 +23,7 @@ describe("User management e2e and UI flows", () => {
     }).as("createUser");
     visitAsAdmin("/account/users");
     cy.wait("@getUsers");
+    cy.wait("@getUsers");
 
     // Act
     cy.contains("button", "Nuevo Usuario").click();

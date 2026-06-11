@@ -41,42 +41,44 @@ const permissionsResponse = [
 
 describe("RBAC admin permissions page", () => {
   beforeEach(() => {
-    cy.clearLocalStorage();
-    cy.clearCookies();
-  });
+    cy.viewport(1280, 720) // ← fix del sidebar oculto
+    cy.clearLocalStorage()
+    cy.clearCookies()
+  })
 
   it("allows ADMIN to reach the Global Permissions page and save a permission change", () => {
-    cy.window().then((win) => {
-      win.localStorage.setItem("token", "admin-token");
-      win.localStorage.setItem("user", JSON.stringify(adminUser));
-    });
-
-    cy.intercept("GET", `${API_URL}/users/`, { statusCode: 200, body: usersResponse }).as("getUsers");
-    cy.intercept("GET", `${API_URL}/users/permissions/list`, { statusCode: 200, body: permissionsResponse }).as("getPermissions");
+    cy.intercept("GET", `${API_URL}/users/`, { statusCode: 200, body: usersResponse }).as("getUsers")
+    cy.intercept("GET", `${API_URL}/users/permissions/list`, { statusCode: 200, body: permissionsResponse }).as("getPermissions")
     cy.intercept("PUT", `${API_URL}/users/1/permissions`, {
       statusCode: 200,
       body: { message: "Permissions updated successfully" },
-    }).as("savePermissions");
+    }).as("savePermissions")
 
-    cy.visit("/account/permissions");
+    cy.visit("/account/permissions", {
+      onBeforeLoad(win) { // ← fix del localStorage antes del visit
+        win.localStorage.setItem("token", "admin-token")
+        win.localStorage.setItem("access_token", "admin-token")
+        win.localStorage.setItem("user", JSON.stringify(adminUser))
+      },
+    })
 
-    cy.wait(["@getUsers", "@getPermissions"]);
-    cy.contains("Permisos Globales").should("be.visible");
-    cy.contains("Ada Admin").click();
-    cy.contains("Seleccionar Usuario").should("be.visible");
-    cy.contains("Gestionar usuarios").click();
-    cy.get("button").contains(/guardar cambios/i).click();
-
-    cy.wait("@savePermissions").its("request.body").should("deep.equal", ["ASSIGN_ROLES", "ASSIGN_GLOBAL_PERMISSIONS"]);
-  });
+    cy.wait(["@getUsers", "@getPermissions"])
+    cy.contains("Permisos Globales").should("be.visible")
+    cy.contains("Ada Admin").click()
+    cy.contains("Seleccionar Usuario").should("be.visible")
+    cy.contains("Gestionar usuarios").click()
+    cy.get("button").contains(/guardar cambios/i).click()
+    cy.wait("@savePermissions").its("request.body").should("deep.equal", ["ASSIGN_ROLES", "ASSIGN_GLOBAL_PERMISSIONS"])
+  })
 
   it("redirects an evaluator away from the Global Permissions page", () => {
-    cy.window().then((win) => {
-      win.localStorage.setItem("token", "evaluator-token");
-      win.localStorage.setItem("user", JSON.stringify(evaluatorUser));
-    });
-
-    cy.visit("/account/permissions");
-    cy.url().should("include", "/dashboard");
-  });
-});
+    cy.visit("/account/permissions", {
+      onBeforeLoad(win) {
+        win.localStorage.setItem("token", "evaluator-token")
+        win.localStorage.setItem("access_token", "evaluator-token")
+        win.localStorage.setItem("user", JSON.stringify(evaluatorUser))
+      },
+    })
+    cy.url().should("include", "/dashboard")
+  })
+})

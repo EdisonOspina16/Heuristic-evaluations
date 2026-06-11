@@ -11,7 +11,6 @@ describe("Login flow", () => {
   beforeEach(() => {  
     cy.clearLocalStorage();
     cy.clearCookies();
-    cy.visit("/login")
   });
 
   it("logs in successfully and lands on the dashboard", () => {

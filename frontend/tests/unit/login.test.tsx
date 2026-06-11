@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { authService } from "@/features/auth/services/auth.service";
-import LoginPage from "./page";
+import LoginPage from "../../src/app/(auth)/login/page";
 
 
 // ── Mocks globales 
@@ -255,7 +255,7 @@ describe("LoginPage", () => {
 
   });
 
-  // ── ERROR DE CREDENCIALES (N6 No→N8) ────────────────────────────────────
+  // ── ERROR DE CREDENCIALES 
 
   describe("error de credenciales", () => {
 
@@ -347,7 +347,7 @@ describe("LoginPage", () => {
 
   });
 
-  // ── VALIDACIÓN NATIVA HTML ───────────────────────────────────────────────
+  // ── VALIDACIÓN NATIVA HTML 
 
   describe("validación de campos requeridos", () => {
 

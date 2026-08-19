@@ -62,3 +62,5 @@ deepeval_heuristic/outputs/
 
 # Test auth cache
 tests-AI/.auth-cache.json
+
+/dist

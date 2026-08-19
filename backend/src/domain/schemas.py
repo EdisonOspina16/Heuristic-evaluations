@@ -174,6 +174,16 @@ class ProgressEntryResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class ResultadoDimensionResponse(BaseModel):
+    dimension_id: int
+    promedio: Decimal
+    total_preguntas: int
+    respondidas: int
+    warnings: int
+    class Config:
+        from_attributes = True
+
+
 class EvaluacionResponse(BaseModel):
     id: int
     plantilla_id: int
@@ -189,18 +199,9 @@ class EvaluacionResponse(BaseModel):
     progress_percentage: int = 0
     answered_count: int = 0
     total_questions: int = 0
-    class Config:
-        from_attributes = True
-
-# --- RESULTADOS ---
-class ResultadoDimensionResponse(BaseModel):
-    dimension_id: int
-    promedio: Decimal
-    total_preguntas: int
-    respondidas: int
-    warnings: int
+    resultados_dimension: List[ResultadoDimensionResponse] = []
     class Config:
         from_attributes = True
 
 class EvaluacionDetalle(EvaluacionResponse):
-    resultados_dimension: List[ResultadoDimensionResponse] = []
+    pass

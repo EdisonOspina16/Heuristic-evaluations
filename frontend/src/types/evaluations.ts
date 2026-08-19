@@ -60,3 +60,29 @@ export interface EvaluationProgress {
   total_questions: number;
   respuestas: RespuestaCreate[];
 }
+
+export interface ResultadoDimension {
+  dimension_id: number;
+  promedio: number;
+  total_preguntas: number;
+  respondidas: number;
+  warnings: number;
+}
+
+export interface EvaluacionResumen {
+  id: number;
+  plantilla_id: number;
+  proyecto_id: number;
+  evaluador_id: number;
+  estado: string;
+  fecha: string;
+  created_at: string;
+  plantilla_nombre?: string;
+  evaluador_nombre?: string;
+  perfil?: string;
+  estudios?: string;
+  progress_percentage: number;
+  answered_count: number;
+  total_questions: number;
+  resultados_dimension: ResultadoDimension[];
+}

@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import { Plantilla, PlantillaEstructura, EvaluacionCreate, EvaluationProgress, RespuestaCreate } from '@/types/evaluations';
+import { Plantilla, PlantillaEstructura, EvaluacionCreate, EvaluacionResumen, EvaluationProgress, RespuestaCreate } from '@/types/evaluations';
 
 /**
  * Servicio encargado de gestionar las plantillas y el envío de evaluaciones.
@@ -37,7 +37,7 @@ export const evaluationsService = {
     return response.data;
   },
 
-  getEvaluationsByProject: async (projectId: number): Promise<any[]> => {
+  getEvaluationsByProject: async (projectId: number): Promise<EvaluacionResumen[]> => {
     const response = await api.get(`/evaluaciones/proyecto/${projectId}`);
     return response.data;
   }

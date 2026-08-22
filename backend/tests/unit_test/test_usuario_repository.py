@@ -85,10 +85,12 @@ def test_create_first_user_assigns_admin_role(monkeypatch):
     assert fake_db.committed is True
     assert user.roles[0].name == "ADMIN"
     assert user.email == "admin@example.com"
+    assert user.creado_por is None
 
 
-def test_create_second_user_assigns_evaluator_role(monkeypatch):
-    # Arrange
+def test_create_second_user_also_assigns_admin_role_with_no_owner(monkeypatch):
+    # Arrange: todo el que se auto-registra (no solo el primero) queda como
+    # ADMIN raíz de su propia "burbuja" (creado_por = None).
     admin_role = Role(id=1, name="ADMIN", description="Administrador")
     evaluator_role = Role(id=2, name="EVALUADOR", description="Evaluador")
     fake_db = FakeSession(1, {"ADMIN": admin_role, "EVALUADOR": evaluator_role})
@@ -99,9 +101,10 @@ def test_create_second_user_assigns_evaluator_role(monkeypatch):
     repository = UsuarioRepository(fake_db)
 
     # Act
-    user = repository.create(build_user_create("Evaluator", "eval@example.com", "Secret123!"))
+    user = repository.create(build_user_create("Otro Admin", "otro-admin@example.com", "Secret123!"))
 
     # Assert
     assert fake_db.committed is True
-    assert user.roles[0].name == "EVALUADOR"
-    assert user.email == "eval@example.com"
+    assert user.roles[0].name == "ADMIN"
+    assert user.email == "otro-admin@example.com"
+    assert user.creado_por is None

@@ -25,31 +25,30 @@ class UsuarioRepository:
 
     def create(self, user_data: UsuarioCreate):
         """
-        Crea un nuevo usuario en la base de datos, encriptando su contraseña
-        con bcrypt antes de persistirla. Implementa la lógica de primer administrador.
+        Crea un nuevo usuario auto-registrado (POST /auth/register).
+
+        Todo el que se auto-registra queda como ADMIN, raíz de su propia
+        "burbuja" (creado_por = NULL): nadie más lo ve en su listado de
+        usuarios. Desde ahí puede crear evaluadores u otros admins mediante
+        POST /users/, quienes sí quedan asociados a él vía creado_por.
         """
         hashed_password = get_password_hash(user_data.password)
-        
-        # Check if this is the first user
-        is_first_user = self.count_users() == 0
-        
+
         db_user = User(
             nombre=user_data.nombre,
             email=user_data.email,
             password_hash=hashed_password,
-            active=True
+            active=True,
+            creado_por=None,
         )
-        
+
         self.db.add(db_user)
         self.db.flush() # Get user ID
-        
-        # Assign role
-        role_name = "ADMIN" if is_first_user else "EVALUADOR"
-        role = self.db.query(Role).filter(Role.name == role_name).first()
-        
+
+        role = self.db.query(Role).filter(Role.name == "ADMIN").first()
         if role:
             db_user.roles.append(role)
-            
+
         self.db.commit()
         self.db.refresh(db_user)
         return db_user

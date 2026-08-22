@@ -105,8 +105,8 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-12">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-white">{plantilla.nombre}</h1>
-        <p className="text-zinc-500">{plantilla.descripcion}</p>
+        <h1 className="text-3xl font-bold text-foreground">{plantilla.nombre}</h1>
+        <p className="text-subtle">{plantilla.descripcion}</p>
 
         {/* ── Progress indicators ── */}
         <div
@@ -116,7 +116,7 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
           aria-valuenow={progressPercent}
           aria-valuemin={0}
           aria-valuemax={100}
-          className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden"
+          className="w-full h-1.5 bg-surface-tint rounded-full overflow-hidden"
         >
           <div
             className="h-full bg-brand-500 transition-all duration-500"
@@ -124,11 +124,11 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
           />
         </div>
 
-        <div data-cy="progress-count" className="text-xs text-zinc-500">
+        <div data-cy="progress-count" className="text-xs text-subtle">
           {answeredQuestions} / {totalQuestions}
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-zinc-500">
+        <div className="flex items-center gap-2 text-xs text-subtle">
           <Save className="w-3 h-3" />
           {saving ? "Guardando progreso..." : lastSavedAt ? `Progreso guardado ${lastSavedAt.toLocaleTimeString()}` : "El progreso se guarda automáticamente"}
         </div>
@@ -139,14 +139,14 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
           {/* data-cy used by tests that count/read dimension headings */}
           <h2
             data-cy="dimension-title"
-            className="text-xl font-semibold text-brand-400 border-b border-white/10 pb-2"
+            className="text-xl font-semibold text-accent-brand border-b border-border-subtle pb-2"
           >
             {dimension.nombre}
           </h2>
 
           <div className="space-y-8">
             {dimension.preguntas.map((pregunta) => (
-              <Card key={pregunta.id} className="bg-white/[0.02] border-white/5">
+              <Card key={pregunta.id} className="bg-surface-tint border-border-subtle">
                 <CardContent className="pt-6 space-y-6">
                   {/*
                     Hidden input per question — single source of truth for test selectors.
@@ -169,9 +169,9 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                   />
 
                   <div className="space-y-2">
-                    <p className="text-lg text-white font-medium">{pregunta.texto}</p>
+                    <p className="text-lg text-foreground font-medium">{pregunta.texto}</p>
                     {pregunta.texto_en && (
-                      <p className="text-sm text-zinc-500 italic">{pregunta.texto_en}</p>
+                      <p className="text-sm text-subtle italic">{pregunta.texto_en}</p>
                     )}
                   </div>
 
@@ -196,11 +196,11 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                             >
                               <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${isSelected
                                 ? "border-brand-500 bg-brand-500/20"
-                                : "border-white/20 group-hover:border-white/40"
+                                : "border-border-subtle group-hover:border-border-hover"
                                 }`}>
                                 {isSelected && <div className="w-3 h-3 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />}
                               </div>
-                              <span className={`text-xs transition-colors ${isSelected ? "text-brand-400 font-bold" : "text-zinc-500 group-hover:text-zinc-400"}`}>
+                              <span className={`text-xs transition-colors ${isSelected ? "text-accent-brand font-bold" : "text-subtle group-hover:text-muted"}`}>
                                 {val}
                               </span>
                             </div>
@@ -223,14 +223,14 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                               }}
                               className={`flex items-center space-x-3 p-4 rounded-2xl border transition-all cursor-pointer ${isSelected
                                 ? "border-brand-500/50 bg-brand-500/10 shadow-lg shadow-brand-500/5"
-                                : "border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-white/10"
+                                : "border-border-subtle bg-surface-tint hover:bg-surface-tint hover:border-border-subtle"
                                 }`}
                             >
-                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isSelected ? "border-brand-500" : "border-white/20"
+                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all ${isSelected ? "border-brand-500" : "border-border-subtle"
                                 }`}>
                                 {isSelected && <div className="w-2.5 h-2.5 rounded-full bg-brand-500" />}
                               </div>
-                              <span className={`flex-1 text-sm transition-colors ${isSelected ? "text-white font-medium" : "text-zinc-400"}`}>
+                              <span className={`flex-1 text-sm transition-colors ${isSelected ? "text-accent-brand font-medium" : "text-muted"}`}>
                                 {opcion.etiqueta}
                               </span>
                             </div>
@@ -241,10 +241,10 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-xs text-zinc-500 uppercase">Comentarios / Observaciones</Label>
+                    <Label className="text-xs text-subtle uppercase">Comentarios / Observaciones</Label>
                     <Textarea
                       placeholder="Agrega detalles adicionales..."
-                      className="bg-black/20 border-white/5 resize-none h-20"
+                      className="bg-surface-tint border-border-subtle resize-none h-20"
                       value={respuestas[pregunta.id]?.comentario || ""}
                       onChange={(e) => updateRespuesta(pregunta.id, { comentario: e.target.value })}
                     />
@@ -263,7 +263,7 @@ export const EvaluationForm: React.FC<EvaluationFormProps> = ({
           size="lg"
           disabled={loading || saving}
           onClick={handleManualSave}
-          className={`px-6 py-6 text-lg bg-zinc-950/90 backdrop-blur border-white/10 transition-all duration-500 ${showSaveProgress
+          className={`px-6 py-6 text-lg bg-surface-tint/90 backdrop-blur border-border-subtle transition-all duration-500 ${showSaveProgress
             ? "opacity-100 translate-y-0 pointer-events-auto"
             : "opacity-0 translate-y-3 pointer-events-none"
             }`}

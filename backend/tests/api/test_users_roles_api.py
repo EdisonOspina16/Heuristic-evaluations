@@ -6,7 +6,7 @@ from user_management_api_helpers import auth_headers, seed_admin, seed_role, see
 def test_update_user_roles_assigns_admin_role(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    target = seed_user(db_session, role_names=["EVALUADOR"])
+    target = seed_user(db_session, role_names=["EVALUADOR"], created_by=admin.id)
     seed_role(db_session, "ADMIN")
 
     # Act
@@ -33,7 +33,7 @@ def test_update_user_roles_blocks_removing_admin_from_last_admin(api_client, db_
 def test_update_user_roles_allows_removing_admin_when_another_admin_exists(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    second_admin = seed_user(db_session, role_names=["ADMIN"])
+    second_admin = seed_user(db_session, role_names=["ADMIN"], created_by=admin.id)
     seed_role(db_session, "EVALUADOR")
 
     # Act

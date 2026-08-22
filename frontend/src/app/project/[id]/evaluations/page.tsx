@@ -72,7 +72,7 @@ export default function EvaluationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-brand-400" />
+        <Loader2 className="w-10 h-10 animate-spin text-accent-brand" />
       </div>
     )
   }
@@ -87,11 +87,11 @@ export default function EvaluationsPage() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium text-zinc-500 uppercase tracking-widest mb-1">
+          <div className="flex items-center gap-2 text-xs font-medium text-subtle uppercase tracking-widest mb-1">
             <Target className="w-3 h-3" />
             Proyecto: {projectName}
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Evaluaciones</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Evaluaciones</h1>
         </div>
         <Link href="/dashboard">
           <Button className="gap-2 shadow-lg shadow-brand-500/20">
@@ -104,7 +104,7 @@ export default function EvaluationsPage() {
       {/* Filters & Search */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between pb-2">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-subtle" />
           <Input 
             placeholder="Buscar por heurística o ID..." 
             className="pl-10"
@@ -121,29 +121,29 @@ export default function EvaluationsPage() {
       </div>
 
       {/* Evaluations Table/List */}
-      <Card className="overflow-hidden bg-white/[0.01] border-white/5">
+      <Card className="overflow-hidden bg-surface-tint border-border-subtle">
         <div className="overflow-x-auto">
           {filteredEvals.length > 0 ? (
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-white/10 bg-white/[0.02]">
-                  <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">ID</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Heurística</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Estado</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Progreso</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-zinc-400 uppercase tracking-wider text-right">Acciones</th>
+                <tr className="border-b border-border-subtle bg-surface-tint">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Heurística</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Estado</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider">Progreso</th>
+                  <th className="px-6 py-4 text-xs font-semibold text-muted uppercase tracking-wider text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {filteredEvals.map((ev) => (
-                  <tr key={ev.id} className="group hover:bg-white/[0.02] transition-colors">
-                    <td className="px-6 py-4 text-sm font-mono text-zinc-500">#{ev.id}</td>
+                  <tr key={ev.id} className="group hover:bg-surface-tint transition-colors">
+                    <td className="px-6 py-4 text-sm font-mono text-subtle">#{ev.id}</td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-white group-hover:text-brand-400 transition-colors">
+                        <span className="text-sm font-medium text-foreground group-hover:text-accent-brand transition-colors">
                           {ev.plantilla_nombre || "Evaluación Heurística"}
                         </span>
-                        <span className="text-xs text-zinc-500 truncate max-w-xs mt-0.5">
+                        <span className="text-xs text-subtle truncate max-w-xs mt-0.5">
                           Perfil: {ev.perfil} | {ev.estudios}
                         </span>
                       </div>
@@ -155,13 +155,13 @@ export default function EvaluationsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3 min-w-40">
-                        <div className="h-2 flex-1 rounded-full bg-zinc-900 overflow-hidden">
+                        <div className="h-2 flex-1 rounded-full bg-bg-elevated overflow-hidden">
                           <div
                             className="h-full rounded-full bg-brand-500"
                             style={{ width: `${ev.progress_percentage || 0}%` }}
                           />
                         </div>
-                        <span className="text-xs text-zinc-500 w-10 text-right">{ev.progress_percentage || 0}%</span>
+                        <span className="text-xs text-subtle w-10 text-right">{ev.progress_percentage || 0}%</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -169,18 +169,18 @@ export default function EvaluationsPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-zinc-500 hover:text-white"
+                          className="h-8 w-8 text-subtle hover:text-foreground"
                           onClick={() => setOpenActionId(openActionId === ev.id ? null : ev.id)}
                         >
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                         {openActionId === ev.id && (
-                          <div className="absolute right-0 top-9 z-20 w-52 overflow-hidden rounded-xl border border-white/10 bg-zinc-950 shadow-2xl">
+                          <div className="absolute right-0 top-9 z-20 w-52 overflow-hidden rounded-xl border border-border-subtle bg-surface-tint shadow-2xl">
                             <Link
                               href={`/evaluacion/${ev.plantilla_id}?project_id=${projectId}&evaluation_id=${ev.id}`}
-                              className="flex items-center gap-2 px-3 py-2.5 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
+                              className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted hover:bg-surface-tint hover:text-foreground transition-colors"
                             >
-                              <PlayCircle className="w-4 h-4 text-brand-400" />
+                              <PlayCircle className="w-4 h-4 text-accent-brand" />
                               {ev.estado === "borrador" ? "Continuar evaluación" : "Editar evaluación"}
                             </Link>
                           </div>
@@ -194,13 +194,13 @@ export default function EvaluationsPage() {
           ) : (
             <div className="p-20 text-center space-y-4">
               <div className="flex justify-center">
-                <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-zinc-600" />
+                <div className="w-16 h-16 bg-bg-elevated rounded-full flex items-center justify-center">
+                  <AlertCircle className="w-8 h-8 text-subtle" />
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-white font-medium">No hay evaluaciones registradas</p>
-                <p className="text-zinc-500 text-sm">Aún no has realizado evaluaciones para este proyecto.</p>
+                <p className="text-foreground font-medium">No hay evaluaciones registradas</p>
+                <p className="text-subtle text-sm">Aún no has realizado evaluaciones para este proyecto.</p>
               </div>
               <Link href="/dashboard" className="inline-block pt-2">
                 <Button className="bg-brand-600 hover:bg-brand-500 text-white">

@@ -58,7 +58,7 @@ export default function ProjectOverviewPage({ params }: { params: Promise<{ id: 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-brand-400" />
+        <Loader2 className="w-10 h-10 animate-spin text-accent-brand" />
       </div>
     )
   }
@@ -81,23 +81,23 @@ export default function ProjectOverviewPage({ params }: { params: Promise<{ id: 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-10">
       {/* Hero Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-white/[0.01] border border-white/5 p-8 rounded-3xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-surface-tint border border-border-subtle p-8 rounded-3xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 blur-[100px] -mr-32 -mt-32" />
 
         <div className="space-y-4 relative z-10">
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="bg-brand-500/10 text-brand-400 border-brand-500/20">
+            <Badge variant="outline" className="bg-brand-500/10 text-accent-brand border-brand-500/20">
               Activo
             </Badge>
-            <span className="text-xs text-zinc-500 flex items-center gap-1">
+            <span className="text-xs text-subtle flex items-center gap-1">
               <Calendar className="w-3 h-3" />
               Creado el {new Date(project.created_at).toLocaleDateString()}
             </span>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white capitalize">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground capitalize">
             {project.nombre}
           </h1>
-          <p className="text-zinc-400 max-w-xl text-lg">
+          <p className="text-muted max-w-xl text-lg">
             {project.descripcion || "Sin descripción disponible."}
           </p>
         </div>
@@ -130,16 +130,16 @@ export default function ProjectOverviewPage({ params }: { params: Promise<{ id: 
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-end gap-4">
-              <div className="text-5xl font-bold text-white">{progressPercent}%</div>
-              <div className="pb-1 text-sm text-zinc-500 font-medium">del objetivo de {goal} evaluaciones</div>
+              <div className="text-5xl font-bold text-foreground">{progressPercent}%</div>
+              <div className="pb-1 text-sm text-subtle font-medium">del objetivo de {goal} evaluaciones</div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <div className="flex justify-between text-xs font-medium uppercase tracking-wider text-subtle">
                 <span>Estado de Avance</span>
                 <span>{evaluations.length} / {goal} completadas</span>
               </div>
-              <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-bg-elevated rounded-full overflow-hidden">
                 <div
                   className="h-full bg-brand-500 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.3)] transition-all duration-1000"
                   style={{ width: `${progressPercent}%` }}
@@ -147,26 +147,26 @@ export default function ProjectOverviewPage({ params }: { params: Promise<{ id: 
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-white/5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border-subtle">
               <div className="space-y-1">
-                <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Evaluaciones</p>
+                <p className="text-[10px] text-subtle uppercase font-bold tracking-widest">Evaluaciones</p>
                 <p className="text-sm font-semibold">{evaluations.length} realizadas</p>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Estado</p>
+                <p className="text-[10px] text-subtle uppercase font-bold tracking-widest">Estado</p>
                 <p className={`text-sm font-semibold ${evaluations.length > 0 ? "text-emerald-500" : "text-amber-500"}`}>
                   {evaluations.length > 0 ? "En progreso" : "Pendiente"}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Última Actividad</p>
+                <p className="text-[10px] text-subtle uppercase font-bold tracking-widest">Última Actividad</p>
                 <p className="text-sm font-semibold">
                   {evaluations.length > 0 ? new Date(evaluations[0].fecha).toLocaleDateString() : "N/A"}
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Iteración</p>
-                <p className="text-sm font-semibold text-zinc-400">V1.0</p>
+                <p className="text-[10px] text-subtle uppercase font-bold tracking-widest">Iteración</p>
+                <p className="text-sm font-semibold text-muted">V1.0</p>
               </div>
             </div>
           </CardContent>
@@ -176,7 +176,7 @@ export default function ProjectOverviewPage({ params }: { params: Promise<{ id: 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Users className="w-5 h-5 text-zinc-400" />
+              <Users className="w-5 h-5 text-muted" />
               Equipo Evaluador
             </CardTitle>
           </CardHeader>
@@ -184,14 +184,14 @@ export default function ProjectOverviewPage({ params }: { params: Promise<{ id: 
             <div className="space-y-4">
               {evaluators.length > 0 ? evaluators.map((member, i) => (
                 <div key={i} className="flex items-center gap-3 group">
-                  <div className="w-9 h-9 rounded-full bg-zinc-800 border border-white/5 flex items-center justify-center text-xs font-bold text-zinc-400 group-hover:border-brand-500/50 transition-colors">
+                  <div className="w-9 h-9 rounded-full bg-surface-tint border border-border-subtle flex items-center justify-center text-xs font-bold text-muted group-hover:border-brand-500/50 transition-colors">
                     {(member.name || member.email || "E").split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-white">{member.name}</p>
-                    <p className="text-xs text-zinc-500">{member.role}</p>
+                    <p className="text-sm font-medium text-foreground">{member.name}</p>
+                    <p className="text-xs text-subtle">{member.role}</p>
                     {member.types.length > 0 && (
-                      <p className="text-[10px] text-zinc-600 truncate max-w-56 mt-0.5">
+                      <p className="text-[10px] text-subtle truncate max-w-56 mt-0.5">
                         {member.types.join(" · ")}
                       </p>
                     )}
@@ -199,7 +199,7 @@ export default function ProjectOverviewPage({ params }: { params: Promise<{ id: 
                   {member.active && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />}
                 </div>
               )) : (
-                <p className="text-xs text-zinc-500 italic py-4">No hay evaluadores registrados aún.</p>
+                <p className="text-xs text-subtle italic py-4">No hay evaluadores registrados aún.</p>
               )}
             </div>
             {canManageTeam && (
@@ -220,13 +220,13 @@ export default function ProjectOverviewPage({ params }: { params: Promise<{ id: 
           { title: "Reportes", desc: "Exportar hallazgos", icon: Calendar, href: "reports", color: "bg-emerald-500/10 text-emerald-400" },
         ].map((item, i) => (
           <Link key={i} href={`/project/${project.id}/${item.href}`}>
-            <Card className="hover:bg-white/[0.03] active:scale-[0.98] transition-all group">
+            <Card className="hover:bg-surface-tint active:scale-[0.98] transition-all group">
               <CardHeader className="p-4 flex-row items-center gap-4 space-y-0">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
                   <item.icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <CardTitle className="text-sm group-hover:text-brand-400 transition-colors">{item.title}</CardTitle>
+                  <CardTitle className="text-sm group-hover:text-accent-brand transition-colors">{item.title}</CardTitle>
                   <CardDescription className="text-[10px]">{item.desc}</CardDescription>
                 </div>
               </CardHeader>

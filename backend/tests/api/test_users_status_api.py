@@ -6,7 +6,7 @@ from user_management_api_helpers import auth_headers, seed_admin, seed_user
 def test_update_user_status_activates_user(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    target = seed_user(db_session, active=False, role_names=["EVALUADOR"])
+    target = seed_user(db_session, active=False, role_names=["EVALUADOR"], created_by=admin.id)
 
     # Act
     response = api_client.patch(f"/users/{target.id}/status?active=true", headers=auth_headers(admin))
@@ -19,7 +19,7 @@ def test_update_user_status_activates_user(api_client, db_session):
 def test_update_user_status_deactivates_evaluator(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    target = seed_user(db_session, active=True, role_names=["EVALUADOR"])
+    target = seed_user(db_session, active=True, role_names=["EVALUADOR"], created_by=admin.id)
 
     # Act
     response = api_client.patch(f"/users/{target.id}/status?active=false", headers=auth_headers(admin))
@@ -44,7 +44,7 @@ def test_update_user_status_blocks_last_active_admin_deactivation(api_client, db
 def test_update_user_status_allows_admin_deactivation_when_another_active_admin_exists(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    second_admin = seed_user(db_session, active=True, role_names=["ADMIN"])
+    second_admin = seed_user(db_session, active=True, role_names=["ADMIN"], created_by=admin.id)
 
     # Act
     response = api_client.patch(f"/users/{second_admin.id}/status?active=false", headers=auth_headers(admin))

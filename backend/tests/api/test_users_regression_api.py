@@ -4,19 +4,20 @@ from user_management_api_helpers import auth_headers, seed_admin, seed_role, see
 
 
 def test_regression_last_admin_stays_reachable_after_blocked_deactivation(api_client, db_session):
-    # Arrange
+    # Arrange: la lista de /users/ ahora solo muestra usuarios creados por el
+    # propio admin (no a sí mismo), así que la persistencia se confirma
+    # volviendo a iniciar sesión en vez de buscarlo en su propio directorio.
     admin = seed_admin(db_session)
     headers = auth_headers(admin)
 
     # Act
     blocked_response = api_client.patch(f"/users/{admin.id}/status?active=false", headers=headers)
-    directory_response = api_client.get("/users/", headers=headers)
+    login_response = api_client.post("/auth/login", json={"email": admin.email, "password": "Secret123!"})
 
     # Assert
     assert blocked_response.status_code == status.HTTP_400_BAD_REQUEST
-    assert directory_response.status_code == status.HTTP_200_OK
-    persisted_admin = next(user for user in directory_response.json() if user["id"] == admin.id)
-    assert persisted_admin["active"] is True
+    assert login_response.status_code == status.HTTP_200_OK
+    assert login_response.json()["user"]["active"] is True
 
 
 def test_regression_last_admin_role_is_preserved_after_blocked_revocation(api_client, db_session):
@@ -27,12 +28,11 @@ def test_regression_last_admin_role_is_preserved_after_blocked_revocation(api_cl
 
     # Act
     blocked_response = api_client.put(f"/users/{admin.id}/roles", headers=headers, json=["EVALUADOR"])
-    directory_response = api_client.get("/users/", headers=headers)
+    login_response = api_client.post("/auth/login", json={"email": admin.email, "password": "Secret123!"})
 
     # Assert
     assert blocked_response.status_code == status.HTTP_400_BAD_REQUEST
-    persisted_admin = next(user for user in directory_response.json() if user["id"] == admin.id)
-    assert persisted_admin["roles"][0]["name"] == "ADMIN"
+    assert login_response.json()["user"]["rol"] == "ADMIN"
 
 
 def test_regression_last_admin_delete_does_not_remove_account(api_client, db_session):
@@ -42,11 +42,11 @@ def test_regression_last_admin_delete_does_not_remove_account(api_client, db_ses
 
     # Act
     blocked_response = api_client.delete(f"/users/{admin.id}", headers=headers)
-    directory_response = api_client.get("/users/", headers=headers)
+    login_response = api_client.post("/auth/login", json={"email": admin.email, "password": "Secret123!"})
 
     # Assert
     assert blocked_response.status_code == status.HTTP_400_BAD_REQUEST
-    assert any(user["id"] == admin.id for user in directory_response.json())
+    assert login_response.status_code == status.HTTP_200_OK
 
 
 def test_regression_user_creation_response_never_exposes_password_hash(api_client, db_session):

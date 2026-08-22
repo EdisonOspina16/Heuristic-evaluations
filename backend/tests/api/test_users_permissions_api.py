@@ -20,7 +20,7 @@ def test_list_permissions_returns_seeded_permissions(api_client, db_session):
 def test_update_permissions_replaces_direct_permissions(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    target = seed_user(db_session, role_names=["EVALUADOR"])
+    target = seed_user(db_session, role_names=["EVALUADOR"], created_by=admin.id)
     seed_permission(db_session, "MANAGE_USERS")
 
     # Act
@@ -38,7 +38,7 @@ def test_update_permissions_replaces_direct_permissions(api_client, db_session):
 def test_update_permissions_can_clear_direct_permissions(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    target = seed_user(db_session, direct_permission_codes=["MANAGE_USERS"])
+    target = seed_user(db_session, direct_permission_codes=["MANAGE_USERS"], created_by=admin.id)
 
     # Act
     response = api_client.put(

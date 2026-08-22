@@ -16,3 +16,5 @@ frontend/.scannerwork/report-task.txt
 
 src/lighthouse/reports/
 .auth-cache.json
+
+.claude

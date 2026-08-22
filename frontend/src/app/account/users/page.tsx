@@ -112,11 +112,11 @@ export default function UsersManagementPage() {
     <div className="p-8 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-            <Users className="w-8 h-8 text-brand-400" />
+          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
+            <Users className="w-8 h-8 text-accent-brand" />
             Gestión de Usuarios
           </h1>
-          <p className="text-zinc-400 mt-1">
+          <p className="text-muted mt-1">
             Administra los usuarios del sistema, sus roles y estados.
           </p>
         </div>
@@ -144,49 +144,49 @@ export default function UsersManagementPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+              className="relative w-full max-w-md bg-bg-elevated border border-border-subtle rounded-3xl shadow-2xl overflow-hidden"
             >
-              <div className="p-6 border-b border-white/5">
-                <h2 className="text-xl font-bold text-white">Crear Nuevo Usuario</h2>
-                <p className="text-sm text-zinc-500">Completa los datos para registrar al nuevo miembro.</p>
+              <div className="p-6 border-b border-border-subtle">
+                <h2 className="text-xl font-bold text-foreground">Crear Nuevo Usuario</h2>
+                <p className="text-sm text-subtle">Completa los datos para registrar al nuevo miembro.</p>
               </div>
               <form onSubmit={handleCreateUser} className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-zinc-400 uppercase">Nombre Completo</label>
+                  <label className="text-xs font-semibold text-muted uppercase">Nombre Completo</label>
                   <Input 
                     required
                     placeholder="Fullname"
-                    className="bg-zinc-800 border-white/5 rounded-xl"
+                    className="bg-surface-tint border-border-subtle rounded-xl"
                     value={newUser.nombre}
                     onChange={(e) => setNewUser({...newUser, nombre: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-zinc-400 uppercase">Email</label>
+                  <label className="text-xs font-semibold text-muted uppercase">Email</label>
                   <Input 
                     required
                     type="email"
                     placeholder="user@ejemplo.com"
-                    className="bg-zinc-800 border-white/5 rounded-xl"
+                    className="bg-surface-tint border-border-subtle rounded-xl"
                     value={newUser.email}
                     onChange={(e) => setNewUser({...newUser, email: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-zinc-400 uppercase">Contraseña</label>
+                  <label className="text-xs font-semibold text-muted uppercase">Contraseña</label>
                   <Input 
                     required
                     type="password"
                     placeholder="••••••••"
-                    className="bg-zinc-800 border-white/5 rounded-xl"
+                    className="bg-surface-tint border-border-subtle rounded-xl"
                     value={newUser.password}
                     onChange={(e) => setNewUser({...newUser, password: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-zinc-400 uppercase">Rol</label>
+                  <label className="text-xs font-semibold text-muted uppercase">Rol</label>
                   <select 
-                    className="w-full bg-zinc-800 border border-white/5 rounded-xl p-3 text-sm text-white outline-none focus:ring-2 focus:ring-brand-500/20"
+                    className="w-full bg-surface-tint border border-border-subtle rounded-xl p-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-brand-500/20"
                     value={newUser.rol}
                     onChange={(e) => setNewUser({...newUser, rol: e.target.value})}
                   >
@@ -200,7 +200,7 @@ export default function UsersManagementPage() {
                     type="button"
                     variant="ghost" 
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 rounded-xl text-zinc-400 hover:text-white"
+                    className="flex-1 rounded-xl text-muted hover:text-foreground"
                   >
                     Cancelar
                   </Button>
@@ -218,13 +218,13 @@ export default function UsersManagementPage() {
         )}
       </AnimatePresence>
 
-      <Card className="bg-zinc-900/50 border-white/5 backdrop-blur-xl rounded-3xl overflow-hidden">
-        <CardHeader className="border-b border-white/5 pb-6">
+      <Card className="bg-bg-elevated/50 border-border-subtle backdrop-blur-xl rounded-3xl overflow-hidden">
+        <CardHeader className="border-b border-border-subtle pb-6">
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-subtle" />
             <Input 
               placeholder="Buscar por nombre o email..." 
-              className="pl-10 bg-zinc-800/50 border-white/10 rounded-xl focus:ring-brand-500/20"
+              className="pl-10 bg-surface-tint/50 border-border-subtle rounded-xl focus:ring-brand-500/20"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -234,7 +234,7 @@ export default function UsersManagementPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 border-b border-white/5">
+                <tr className="text-[10px] font-bold uppercase tracking-wider text-subtle border-b border-border-subtle">
                   <th className="px-6 py-4">Usuario</th>
                   <th className="px-6 py-4">Rol</th>
                   <th className="px-6 py-4">Estado</th>
@@ -246,27 +246,27 @@ export default function UsersManagementPage() {
                 {loading ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-20 text-center">
-                      <Loader2 className="w-8 h-8 animate-spin text-brand-400 mx-auto" />
-                      <p className="text-zinc-500 mt-4 text-sm">Cargando usuarios...</p>
+                      <Loader2 className="w-8 h-8 animate-spin text-accent-brand mx-auto" />
+                      <p className="text-subtle mt-4 text-sm">Cargando usuarios...</p>
                     </td>
                   </tr>
                 ) : filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-20 text-center text-zinc-500">
+                    <td colSpan={5} className="px-6 py-20 text-center text-subtle">
                       No se encontraron usuarios.
                     </td>
                   </tr>
                 ) : (
                   filteredUsers.map((user) => (
-                    <tr key={user.id} className="group hover:bg-white/[0.02] transition-colors">
+                    <tr key={user.id} className="group hover:bg-surface-tint transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center border border-white/10 text-brand-400 font-bold">
+                          <div className="w-10 h-10 rounded-full bg-surface-tint flex items-center justify-center border border-border-subtle text-accent-brand font-bold">
                             {user.nombre[0].toUpperCase()}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-white">{user.nombre}</p>
-                            <p className="text-xs text-zinc-500 flex items-center gap-1">
+                            <p className="text-sm font-semibold text-foreground">{user.nombre}</p>
+                            <p className="text-xs text-subtle flex items-center gap-1">
                               <Mail className="w-3 h-3" />
                               {user.email}
                             </p>
@@ -277,9 +277,9 @@ export default function UsersManagementPage() {
                         <div className="flex items-center gap-2">
                           <Shield className={cn(
                             "w-4 h-4",
-                            user.roles?.[0]?.name === "ADMIN" ? "text-amber-400" : "text-brand-400"
+                            user.roles?.[0]?.name === "ADMIN" ? "text-amber-400" : "text-accent-brand"
                           )} />
-                          <span className="text-sm text-zinc-300">
+                          <span className="text-sm text-muted">
                             {user.roles?.[0]?.name || "EVALUADOR"}
                           </span>
                         </div>
@@ -295,7 +295,7 @@ export default function UsersManagementPage() {
                         </Badge>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-xs text-zinc-500">
+                        <span className="text-xs text-subtle">
                           {new Date(user.created_at).toLocaleDateString()}
                         </span>
                       </td>
@@ -316,7 +316,7 @@ export default function UsersManagementPage() {
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5"
+                            className="h-8 w-8 rounded-lg text-muted hover:text-foreground hover:bg-surface-tint"
                             onClick={() => deleteUser(user.id)}
                             title="Eliminar"
                           >
@@ -325,7 +325,7 @@ export default function UsersManagementPage() {
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5"
+                            className="h-8 w-8 rounded-lg text-muted hover:text-foreground hover:bg-surface-tint"
                           >
                             <MoreVertical className="w-4 h-4" />
                           </Button>

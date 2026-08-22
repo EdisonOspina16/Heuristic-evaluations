@@ -124,8 +124,8 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">Dashboard</h1>
-          <p className="text-zinc-500 mt-1">Bienvenido de nuevo. Aquí tienes las herramientas para tus evaluaciones de usabilidad.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-subtle mt-1">Bienvenido de nuevo. Aquí tienes las herramientas para tus evaluaciones de usabilidad.</p>
         </div>
         {authService.can("CREATE_PROJECTS") && (
           <Button onClick={() => setIsModalOpen(true)} className="bg-brand-600 hover:bg-brand-500 text-white gap-2">
@@ -150,38 +150,38 @@ export default function DashboardPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+              className="relative w-full max-w-md bg-bg-elevated border border-border-subtle rounded-3xl shadow-2xl overflow-hidden"
             >
-              <div className="p-6 border-b border-white/5">
-                <h2 className="text-xl font-bold text-white">Nuevo Proyecto</h2>
-                <p className="text-sm text-zinc-500">Define un espacio de trabajo para tus evaluaciones.</p>
+              <div className="p-6 border-b border-border-subtle">
+                <h2 className="text-xl font-bold text-foreground">Nuevo Proyecto</h2>
+                <p className="text-sm text-subtle">Define un espacio de trabajo para tus evaluaciones.</p>
               </div>
               <form onSubmit={handleCreateProject} className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-zinc-400 uppercase">Nombre del Proyecto</label>
+                  <label className="text-xs font-semibold text-muted uppercase">Nombre del Proyecto</label>
                   <input 
                     required
                     placeholder="Ej: Rediseño App Móvil"
-                    className="w-full bg-zinc-800 border border-white/5 rounded-xl p-3 text-sm text-white outline-none focus:ring-2 focus:ring-brand-500/20"
+                    className="w-full bg-surface-tint border border-border-subtle rounded-xl p-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-brand-500/20"
                     value={newProject.nombre}
                     onChange={(e) => setNewProject({...newProject, nombre: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-zinc-400 uppercase">Cliente / Empresa</label>
+                  <label className="text-xs font-semibold text-muted uppercase">Cliente / Empresa</label>
                   <input 
                     placeholder="Ej: Banco Global"
-                    className="w-full bg-zinc-800 border border-white/5 rounded-xl p-3 text-sm text-white outline-none focus:ring-2 focus:ring-brand-500/20"
+                    className="w-full bg-surface-tint border border-border-subtle rounded-xl p-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-brand-500/20"
                     value={newProject.cliente}
                     onChange={(e) => setNewProject({...newProject, cliente: e.target.value})}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-zinc-400 uppercase">Descripción</label>
+                  <label className="text-xs font-semibold text-muted uppercase">Descripción</label>
                   <textarea 
                     rows={3}
                     placeholder="Breve descripción del alcance..."
-                    className="w-full bg-zinc-800 border border-white/5 rounded-xl p-3 text-sm text-white outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
+                    className="w-full bg-surface-tint border border-border-subtle rounded-xl p-3 text-sm text-foreground outline-none focus:ring-2 focus:ring-brand-500/20 resize-none"
                     value={newProject.descripcion}
                     onChange={(e) => setNewProject({...newProject, descripcion: e.target.value})}
                   />
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                     type="button"
                     variant="ghost" 
                     onClick={() => setIsModalOpen(false)}
-                    className="flex-1 rounded-xl text-zinc-400 hover:text-white"
+                    className="flex-1 rounded-xl text-muted hover:text-foreground"
                   >
                     Cancelar
                   </Button>
@@ -225,20 +225,20 @@ export default function DashboardPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-zinc-900 border border-white/10 rounded-3xl shadow-2xl overflow-hidden"
+              className="relative w-full max-w-md bg-bg-elevated border border-border-subtle rounded-3xl shadow-2xl overflow-hidden"
             >
-              <div className="p-6 border-b border-white/5">
-                <h2 className="text-xl font-bold text-white">Iniciar Evaluación</h2>
-                <p className="text-sm text-zinc-500">
-                  Selecciona el proyecto al que pertenecerá esta evaluación de <span className="text-brand-400 font-semibold">{selectedPlantilla?.nombre}</span>.
+              <div className="p-6 border-b border-border-subtle">
+                <h2 className="text-xl font-bold text-foreground">Iniciar Evaluación</h2>
+                <p className="text-sm text-subtle">
+                  Selecciona el proyecto al que pertenecerá esta evaluación de <span className="text-accent-brand font-semibold">{selectedPlantilla?.nombre}</span>.
                 </p>
               </div>
               <div className="p-6 space-y-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-zinc-400 uppercase">Seleccionar Proyecto</label>
+                  <label className="text-xs font-semibold text-muted uppercase">Seleccionar Proyecto</label>
                   {projects.length > 0 ? (
                     <select 
-                      className="w-full bg-zinc-800 border border-white/5 rounded-xl p-4 text-sm text-white outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none"
+                      className="w-full bg-surface-tint border border-border-subtle rounded-xl p-4 text-sm text-foreground outline-none focus:ring-2 focus:ring-brand-500/20 appearance-none"
                       value={selectedProjectId}
                       onChange={(e) => setSelectedProjectId(e.target.value)}
                     >
@@ -252,7 +252,7 @@ export default function DashboardPage() {
                       <p className="text-sm text-red-400">No tienes proyectos creados.</p>
                       <Button 
                         variant="ghost" 
-                        className="text-brand-400 text-xs mt-1"
+                        className="text-accent-brand text-xs mt-1"
                         onClick={() => {
                           setIsEvalModalOpen(false);
                           setIsModalOpen(true);
@@ -273,7 +273,7 @@ export default function DashboardPage() {
                   <Button 
                     variant="ghost" 
                     onClick={() => setIsEvalModalOpen(false)}
-                    className="flex-1 rounded-xl text-zinc-400 hover:text-white"
+                    className="flex-1 rounded-xl text-muted hover:text-foreground"
                   >
                     Cancelar
                   </Button>
@@ -294,16 +294,16 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat) => (
-          <Card key={stat.label} className="bg-white/[0.01]">
+          <Card key={stat.label} className="bg-surface-tint">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+              <CardTitle className="text-xs font-medium text-subtle uppercase tracking-wider">
                 {stat.label}
               </CardTitle>
-              <stat.icon className="w-4 h-4 text-zinc-600" />
+              <stat.icon className="w-4 h-4 text-subtle" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{stat.value}</div>
-              <p className="text-xs text-zinc-500 mt-1">
+              <p className="text-xs text-subtle mt-1">
                 <span className="text-emerald-500 font-medium">{stat.change}</span>
               </p>
             </CardContent>
@@ -313,7 +313,7 @@ export default function DashboardPage() {
 
       {/* Templates Section */}
       {recurrentTypes.length > 0 && (
-        <Card className="bg-white/[0.01] border-white/5">
+        <Card className="bg-surface-tint border-border-subtle">
           <CardHeader>
             <CardTitle className="text-lg">Tipos de evaluación más recurrentes</CardTitle>
             <CardDescription>Frecuencia calculada con las evaluaciones registradas en tus proyectos.</CardDescription>
@@ -331,8 +331,8 @@ export default function DashboardPage() {
       {/* Templates Section */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Plantillas de Evaluación</h2>
-          <Badge variant="outline" className="border-brand-500/20 text-brand-400">
+          <h2 className="text-xl font-semibold text-foreground">Plantillas de Evaluación</h2>
+          <Badge variant="outline" className="border-brand-500/20 text-accent-brand">
             {loading ? "Cargando..." : "Listas para usar"}
           </Badge>
         </div>
@@ -344,12 +344,12 @@ export default function DashboardPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {plantillas.map((plantilla) => (
-              <Card key={plantilla.id} className="group relative overflow-hidden hover:bg-white/[0.03] transition-all">
+              <Card key={plantilla.id} className="group relative overflow-hidden hover:bg-surface-tint transition-all">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                    <FileText className="w-12 h-12" />
                 </div>
                 <CardHeader>
-                  <CardTitle className="text-lg group-hover:text-brand-400 transition-colors">
+                  <CardTitle className="text-lg group-hover:text-accent-brand transition-colors">
                     {plantilla.nombre}
                   </CardTitle>
                   <CardDescription className="line-clamp-2">
@@ -382,14 +382,14 @@ export default function DashboardPage() {
              <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
                 <div className="flex items-center gap-3">
                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                   <span className="text-sm text-zinc-200">Backend FastAPI</span>
+                   <span className="text-sm text-foreground">Backend FastAPI</span>
                 </div>
                 <span className="text-xs text-emerald-500 font-medium">ONLINE</span>
              </div>
              <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
                 <div className="flex items-center gap-3">
                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                   <span className="text-sm text-zinc-200">Base de Datos PostgreSQL</span>
+                   <span className="text-sm text-foreground">Base de Datos PostgreSQL</span>
                 </div>
                 <span className="text-xs text-emerald-500 font-medium">CONECTADA</span>
              </div>
@@ -398,10 +398,10 @@ export default function DashboardPage() {
         
         <Card className="bg-brand-600/5 border-brand-500/10">
           <CardHeader>
-             <CardTitle className="text-lg text-brand-400">Guía de Uso</CardTitle>
+             <CardTitle className="text-lg text-accent-brand">Guía de Uso</CardTitle>
              <CardDescription>Cómo empezar con la plataforma.</CardDescription>
           </CardHeader>
-          <CardContent className="text-sm text-zinc-400 space-y-4">
+          <CardContent className="text-sm text-muted space-y-4">
              <p>1. Selecciona una plantilla de la lista superior.</p>
              <p>2. Completa los campos requeridos en el formulario dinámico.</p>
              <p>3. El sistema procesará automáticamente los promedios por dimensión y generará alertas si detecta problemas críticos de usabilidad.</p>

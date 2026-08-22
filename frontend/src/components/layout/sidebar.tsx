@@ -23,7 +23,6 @@ import { cn, Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import { authService, User as UserType } from "@/features/auth/services/auth.service"
 import { projectsService, Project } from "@/features/projects/services/projects.service"
-import { ThemeToggle } from "@/components/ThemeToggle"
 
 const navItems = [
   { name: "Overview", icon: LayoutDashboard, href: "/dashboard" },
@@ -72,9 +71,9 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const isAdmin = user?.rol === "ADMIN"
 
   const sidebarContent = (
-    <aside className="w-[var(--sidebar-width)] h-full border-r border-white/5 bg-bg-sidebar flex flex-col z-50">
+    <aside className="w-[var(--sidebar-width)] h-full border-r border-border-subtle bg-bg-sidebar flex flex-col z-50">
       {/* Header */}
-      <div className="h-14 flex items-center justify-between px-6 border-b border-white/5">
+      <div className="h-14 flex items-center justify-between px-6 border-b border-border-subtle">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center">
             <FolderKanban className="w-4 h-4 text-white" />
@@ -88,7 +87,6 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             <X className="h-4 w-4" />
           </Button>
         )}
-        {!onClose && <ThemeToggle />}
       </div>
 
       {/* Main Nav */}
@@ -104,13 +102,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors group",
                   isActive 
-                    ? "bg-brand-500/10 text-brand-400" 
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    ? "bg-brand-500/10 text-accent-brand" 
+                    : "text-muted hover:text-foreground hover:bg-surface-tint"
                 )}
               >
                 <item.icon className={cn(
                   "w-4 h-4 transition-colors",
-                  isActive ? "text-brand-400" : "text-zinc-500 group-hover:text-zinc-300"
+                  isActive ? "text-accent-brand" : "text-subtle group-hover:text-muted"
                 )} />
                 {item.name}
               </Link>
@@ -122,7 +120,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {isAdmin && (
           <div className="mt-10">
             <div className="px-3 mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-subtle">
                 Administración
               </span>
             </div>
@@ -137,13 +135,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                     className={cn(
                       "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors group",
                       isActive 
-                        ? "bg-brand-500/10 text-brand-400" 
-                        : "text-zinc-400 hover:text-white hover:bg-white/5"
+                        ? "bg-brand-500/10 text-accent-brand" 
+                        : "text-muted hover:text-foreground hover:bg-surface-tint"
                     )}
                   >
                     <item.icon className={cn(
                       "w-4 h-4 transition-colors",
-                      isActive ? "text-brand-400" : "text-zinc-500 group-hover:text-zinc-300"
+                      isActive ? "text-accent-brand" : "text-subtle group-hover:text-muted"
                     )} />
                     {item.name}
                   </Link>
@@ -156,7 +154,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Projects Section */}
         <div className="mt-10">
           <div className="flex items-center justify-between px-3 mb-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-subtle">
               Proyectos Recientes
             </span>
             <Button variant="ghost" size="icon" className="h-4 w-4">
@@ -170,36 +168,36 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   key={proj.id}
                   href={`/project/${proj.id}`}
                   onClick={onClose}
-                  className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-colors group"
+                  className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium text-muted hover:text-foreground hover:bg-surface-tint transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-zinc-600 group-hover:bg-brand-400 transition-colors" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-subtle group-hover:bg-brand-400 transition-colors" />
                     <span className="truncate max-w-[140px]">{proj.nombre}</span>
                   </div>
-                  <ChevronRight className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 opacity-0 group-hover:opacity-100 transition-all" />
+                  <ChevronRight className="w-3 h-3 text-subtle opacity-0 group-hover:opacity-100 transition-all" />
                 </Link>
               ))
             ) : (
-              <p className="px-3 py-2 text-[10px] text-zinc-600 italic">No hay proyectos activos</p>
+              <p className="px-3 py-2 text-[10px] text-subtle italic">No hay proyectos activos</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Footer / User */}
-      <div className="p-4 border-t border-white/5 bg-white/[0.01] relative">
+      <div className="p-4 border-t border-border-subtle bg-surface-tint relative">
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute bottom-full left-4 right-4 mb-2 p-2 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl z-[60]"
+              className="absolute bottom-full left-4 right-4 mb-2 p-2 bg-bg-elevated border border-border-subtle rounded-xl shadow-2xl z-[60]"
             >
               <Link
                 href="/account"
                 onClick={() => setIsMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2 text-sm text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                className="flex items-center gap-3 px-3 py-2 text-sm text-muted hover:text-foreground hover:bg-surface-tint rounded-lg transition-colors"
               >
                 <User className="w-4 h-4" />
                 Mi Cuenta
@@ -219,18 +217,18 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div 
           data-testid="sidebar-user-toggle"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer group"
+          className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-surface-tint transition-colors cursor-pointer group"
         >
-          <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center border border-white/10 overflow-hidden">
-             <User className="w-5 h-5 text-zinc-400" />
+          <div className="w-8 h-8 rounded-full bg-surface-tint flex items-center justify-center border border-border-subtle overflow-hidden">
+             <User className="w-5 h-5 text-muted" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">{user?.nombre || "Usuario"}</p>
-            <p className="text-[10px] text-zinc-500 truncate capitalize">{user?.rol || "Evaluador"} Account</p>
+            <p className="text-sm font-medium text-foreground truncate">{user?.nombre || "Usuario"}</p>
+            <p className="text-[10px] text-subtle truncate capitalize">{user?.rol || "Evaluador"} Account</p>
           </div>
           <Settings className={cn(
             "w-4 h-4 transition-all duration-300",
-            isMenuOpen ? "rotate-90 text-brand-400" : "text-zinc-600 group-hover:text-zinc-400"
+            isMenuOpen ? "rotate-90 text-accent-brand" : "text-subtle group-hover:text-muted"
           )} />
         </div>
       </div>

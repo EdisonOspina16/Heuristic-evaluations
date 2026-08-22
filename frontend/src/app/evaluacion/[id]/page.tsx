@@ -27,12 +27,12 @@ export default function EvaluationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-bg-deep text-foreground p-8">
       <div className="max-w-4xl mx-auto space-y-8">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           onClick={() => router.back()}
-          className="text-zinc-500 hover:text-white"
+          className="text-subtle hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Volver al Dashboard

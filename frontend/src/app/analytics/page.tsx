@@ -1,33 +1,145 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowRight, BarChart3, Loader2 } from "lucide-react"
-import { evaluationsService } from "@/features/evaluations/services/evaluations.service"
-import { projectsService, type Project, type ProjectAssignment } from "@/features/projects/services/projects.service"
-import type { EvaluacionResumen } from "@/types/evaluations"
+import { analyticsService } from "@/features/analytics/services/analytics.service"
+import { ProjectSummaryCard } from "@/features/analytics/types"
+import { STATUS_COLORS } from "@/features/analytics/colors"
 
-type Item = { project: Project; evaluations: EvaluacionResumen[]; assignments: ProjectAssignment[] }
-const completed = new Set(["completada", "completado", "finalizada"])
-const colors = ["text-indigo-300 border-indigo-400/35 bg-indigo-400/10", "text-emerald-300 border-emerald-400/35 bg-emerald-400/10", "text-pink-300 border-pink-400/35 bg-pink-400/10", "text-orange-300 border-orange-400/35 bg-orange-400/10"]
-function initial(name?: string) { return (name || "E").split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() }
-function formatDate(value?: string) { return value ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value)) : "Sin iniciar" }
-
-export default function AnalyticsPage() {
-  const [items, setItems] = useState<Item[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  useEffect(() => { async function load() { try { const projects = await projectsService.getProjects(); setItems(await Promise.all(projects.map(async (project) => { const [evaluations, assignments] = await Promise.all([evaluationsService.getEvaluationsByProject(project.id).catch(() => []), projectsService.getAssignments(project.id).catch(() => [])]); return { project, evaluations, assignments } }))) } catch { setError("No se pudieron cargar los proyectos para el análisis.") } finally { setLoading(false) } } load() }, [])
-  const withData = items.filter((item) => item.evaluations.some((evaluation) => evaluation.resultados_dimension.length > 0))
-  const pending = items.filter((item) => !withData.includes(item))
-  const summary = useMemo(() => ({ projects: withData.length, evaluations: withData.reduce((total, item) => total + item.evaluations.length, 0), evaluators: new Set(withData.flatMap((item) => item.assignments.map((assignment) => assignment.evaluator_id))).size, alerts: withData.reduce((total, item) => total + item.evaluations.flatMap((evaluation) => evaluation.resultados_dimension).reduce((sum, result) => sum + result.warnings, 0), 0) }), [withData])
-  return <main className="min-h-full bg-[#111318] px-6 py-8 text-[#eef0f6] md:px-9 md:py-8">
-    <header className="mb-8"><div className="mb-1.5 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.07em] text-[#5f6580]"><BarChart3 className="h-3.5 w-3.5 text-indigo-300" /> Analytics</div><h1 className="text-2xl font-bold tracking-[-0.025em]">Selecciona un proyecto para analizar</h1><p className="mt-1.5 text-sm text-[#5f6580]">Elige un proyecto para consultar su dashboard de evaluación heurística, métricas e insights.</p></header>
-    {loading && <div className="flex justify-center gap-3 py-24 text-sm text-[#5f6580]"><Loader2 className="h-5 w-5 animate-spin text-indigo-400" /> Cargando proyectos...</div>}
-    {error && <p className="rounded-xl border border-rose-400/20 bg-rose-500/5 p-5 text-sm text-rose-300">{error}</p>}
-    {!loading && !error && <><section className="mb-8 flex flex-wrap gap-3">{[{ label: "Proyectos con datos", value: summary.projects, color: "text-indigo-300" }, { label: "Alertas registradas", value: summary.alerts, color: "text-rose-400" }, { label: "Evaluaciones totales", value: summary.evaluations, color: "text-emerald-300" }, { label: "Evaluadores asignados", value: summary.evaluators, color: "text-orange-300" }].map((metric) => <div key={metric.label} className="min-w-[155px] rounded-xl border border-white/[0.07] bg-[#161920] px-[18px] py-[14px]"><p className={`font-mono text-[22px] leading-none ${metric.color}`}>{metric.value}</p><p className="mt-1 text-xs text-[#5f6580]">{metric.label}</p></div>)}</section>{withData.length > 0 && <ProjectSection title={`Listos para analizar — ${withData.length} proyecto${withData.length === 1 ? "" : "s"}`} items={withData} />}{pending.length > 0 && <ProjectSection title="En espera de resultados" items={pending} muted />}{items.length === 0 && <p className="py-20 text-center text-sm text-[#5f6580]">No hay proyectos disponibles para analizar.</p>}</>}
-  </main>
+function formatDate(value?: string | null) {
+  return value ? new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value)) : "Sin iniciar"
 }
 
-function ProjectSection({ title, items, muted = false }: { title: string; items: Item[]; muted?: boolean }) { return <section className="mb-8"><h2 className="mb-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.07em] text-[#5f6580]">{title}</h2><div className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-3">{items.map((item) => <ProjectCard key={item.project.id} item={item} muted={muted} />)}</div></section> }
-function ProjectCard({ item, muted }: { item: Item; muted: boolean }) { const hasData = !muted; const warnings = item.evaluations.flatMap((evaluation) => evaluation.resultados_dimension).reduce((sum, result) => sum + result.warnings, 0); const done = item.evaluations.filter((evaluation) => completed.has(evaluation.estado)).length; const people = item.assignments.length ? item.assignments.map((assignment) => assignment.evaluator_name) : [...new Set(item.evaluations.map((evaluation) => evaluation.evaluador_nombre).filter(Boolean))] as string[]; const last = item.evaluations[0]?.created_at; return <Link href={`/project/${item.project.id}/analytics`} className="group rounded-[14px] focus:outline-none focus:ring-2 focus:ring-indigo-400/60"><article className="overflow-hidden rounded-[14px] border border-white/[0.07] bg-[#161920] transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-indigo-400/30 group-hover:bg-[#1c1f2b] group-hover:shadow-[0_4px_24px_rgba(99,102,241,0.1)]"><div className="p-[18px] pb-[14px]"><div className="mb-2 flex items-start justify-between gap-3"><div className="min-w-0"><p className="mb-1 text-[10px] uppercase tracking-[0.04em] text-[#5f6580]">{item.project.cliente || "Proyecto"}</p><h3 className="truncate text-sm font-bold tracking-[-0.01em] text-[#eef0f6]">{item.project.nombre}</h3></div><span className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold ${hasData ? "bg-indigo-400/10 text-indigo-300" : "bg-zinc-500/15 text-zinc-400"}`}>{hasData ? "Activo" : "Borrador"}</span></div><p className="line-clamp-2 min-h-9 text-xs leading-[1.55] text-[#5f6580]">{item.project.descripcion || "Sin descripción del proyecto."}</p></div>{hasData ? <><div className="border-y border-white/[0.04] bg-black/20 px-[18px] py-3"><div className="mb-2 flex justify-between text-[11px]"><span className="font-mono tracking-[0.04em] text-[#5f6580]">ALERTAS REGISTRADAS</span><span className="font-mono font-medium text-rose-400">{warnings}</span></div><div className="h-1.5 overflow-hidden rounded-full bg-white/[0.05]"><div className="h-full rounded-full bg-gradient-to-r from-rose-500/55 to-rose-400" style={{ width: `${warnings ? 70 : 10}%` }} /></div></div><div className="flex gap-1.5 px-[18px] py-2.5">{warnings > 0 && <span className="rounded bg-rose-500/[0.06] px-1.5 py-0.5 text-[11px] font-semibold text-rose-400">{warnings} alerta{warnings === 1 ? "" : "s"}</span>}<span className="rounded bg-indigo-500/[0.06] px-1.5 py-0.5 text-[11px] font-semibold text-indigo-300">{done} finalizada{done === 1 ? "" : "s"}</span></div></> : <div className="border-t border-white/[0.04] px-[18px] py-3 text-xs text-[#5f6580]">No hay evaluaciones con resultados todavía.</div>}<div className="flex items-center gap-2 border-t border-white/[0.04] px-[18px] py-3"><div className="flex -space-x-1.5">{people.slice(0, 4).map((person, index) => <span key={`${person}-${index}`} className={`inline-flex h-[22px] w-[22px] items-center justify-center rounded-full border text-[8px] font-semibold ${colors[index % colors.length]}`}>{initial(person)}</span>)}</div><span className="text-[11px] text-[#5f6580]">{people.length} evaluador{people.length === 1 ? "" : "es"}</span><span className="text-[11px] text-[#5f6580]">·</span><span className="text-[11px] text-[#5f6580]">{item.evaluations.length} evaluación{item.evaluations.length === 1 ? "" : "es"}</span><span className="ml-auto text-[11px] text-[#5f6580]">{formatDate(last)}</span>{hasData && <ArrowRight className="h-3.5 w-3.5 text-indigo-300 opacity-40 transition-opacity group-hover:opacity-100" />}</div></article></Link> }
+export default function AnalyticsPage() {
+  const [items, setItems] = useState<ProjectSummaryCard[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setItems(await analyticsService.getProjectsSummary())
+      } catch {
+        setError("No se pudieron cargar los proyectos para el análisis.")
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const withData = items.filter((item) => item.has_data)
+  const pending = items.filter((item) => !item.has_data)
+  const summary = {
+    projects: withData.length,
+    evaluations: withData.reduce((total, item) => total + item.evaluations_count, 0),
+    alerts: withData.reduce((total, item) => total + item.severity.high + item.severity.medium + item.severity.low, 0),
+  }
+
+  return (
+    <main className="min-h-full bg-bg-deep px-6 py-8 text-foreground md:px-9 md:py-8">
+      <header className="mb-8">
+        <div className="mb-1.5 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.07em] text-subtle">
+          <BarChart3 className="h-3.5 w-3.5 text-accent-indigo" /> Analytics
+        </div>
+        <h1 className="text-2xl font-bold tracking-[-0.025em]">Selecciona un proyecto para analizar</h1>
+        <p className="mt-1.5 text-sm text-subtle">Elige un proyecto para consultar su dashboard de evaluación heurística, métricas e insights.</p>
+      </header>
+      {loading && (
+        <div className="flex justify-center gap-3 py-24 text-sm text-subtle">
+          <Loader2 className="h-5 w-5 animate-spin text-accent-indigo" /> Cargando proyectos...
+        </div>
+      )}
+      {error && <p className="rounded-xl border border-rose-400/20 bg-rose-500/5 p-5 text-sm text-accent-rose">{error}</p>}
+      {!loading && !error && (
+        <>
+          <section className="mb-8 flex flex-wrap gap-3">
+            {[
+              { label: "Proyectos con datos", value: summary.projects, color: "text-accent-indigo" },
+              { label: "Issues registrados", value: summary.alerts, color: "text-accent-rose" },
+              { label: "Evaluaciones totales", value: summary.evaluations, color: "text-accent-emerald" },
+            ].map((metric) => (
+              <div key={metric.label} className="min-w-[155px] rounded-xl border border-border-subtle bg-bg-card px-[18px] py-[14px]">
+                <p className={`font-mono text-[22px] leading-none ${metric.color}`}>{metric.value}</p>
+                <p className="mt-1 text-xs text-subtle">{metric.label}</p>
+              </div>
+            ))}
+          </section>
+          {withData.length > 0 && <ProjectSection title={`Con datos — ${withData.length} proyecto${withData.length === 1 ? "" : "s"}`} items={withData} />}
+          {pending.length > 0 && <ProjectSection title="En espera de evaluaciones" items={pending} muted />}
+          {items.length === 0 && <p className="py-20 text-center text-sm text-subtle">No hay proyectos disponibles para analizar.</p>}
+        </>
+      )}
+    </main>
+  )
+}
+
+function ProjectSection({ title, items, muted = false }: { title: string; items: ProjectSummaryCard[]; muted?: boolean }) {
+  return (
+    <section className="mb-8">
+      <h2 className="mb-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.07em] text-subtle">{title}</h2>
+      <div className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-3">
+        {items.map((item) => (
+          <ProjectCard key={item.id} item={item} muted={muted} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ProjectCard({ item, muted }: { item: ProjectSummaryCard; muted: boolean }) {
+  const hasData = !muted
+  const totalSeverity = item.severity.high + item.severity.medium + item.severity.low
+  const statusColor = STATUS_COLORS[item.status] || STATUS_COLORS["Sin datos"]
+
+  return (
+    <Link href={`/project/${item.id}/analytics`} className="group rounded-[14px] focus:outline-none focus:ring-2 focus:ring-indigo-400/60">
+      <article className="overflow-hidden rounded-[14px] border border-border-subtle bg-bg-card transition-all duration-200 group-hover:-translate-y-0.5 group-hover:border-indigo-400/30 group-hover:bg-bg-elevated group-hover:shadow-[0_4px_24px_rgba(99,102,241,0.1)]">
+        <div className="p-[18px] pb-[14px]">
+          <div className="mb-2 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="mb-1 text-[10px] uppercase tracking-[0.04em] text-subtle">{item.cliente || "Proyecto"}</p>
+              <h3 className="truncate text-sm font-bold tracking-[-0.01em] text-foreground">{item.nombre}</h3>
+            </div>
+            <span
+              className="shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold"
+              style={hasData ? { color: statusColor, backgroundColor: `${statusColor}1a` } : undefined}
+            >
+              {hasData ? item.status : "Borrador"}
+            </span>
+          </div>
+          <p className="line-clamp-2 min-h-9 text-xs leading-[1.55] text-subtle">{item.descripcion || "Sin descripción del proyecto."}</p>
+        </div>
+        {hasData ? (
+          <>
+            <div className="border-y border-border-subtle bg-surface-tint px-[18px] py-3">
+              <div className="mb-2 flex justify-between text-[11px]">
+                <span className="font-mono tracking-[0.04em] text-subtle">UX SCORE</span>
+                <span className="font-mono font-medium" style={{ color: statusColor }}>{item.ux_score ?? "—"}</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-surface-tint">
+                <div className="h-full rounded-full" style={{ width: `${item.ux_score ?? 0}%`, backgroundColor: statusColor }} />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-1.5 px-[18px] py-2.5">
+              {item.severity.high > 0 && <span className="rounded bg-rose-500/[0.1] px-1.5 py-0.5 text-[11px] font-semibold text-accent-rose">{item.severity.high} alta{item.severity.high === 1 ? "" : "s"}</span>}
+              {item.severity.medium > 0 && <span className="rounded bg-orange-500/[0.1] px-1.5 py-0.5 text-[11px] font-semibold text-accent-orange">{item.severity.medium} media{item.severity.medium === 1 ? "" : "s"}</span>}
+              {item.severity.low > 0 && <span className="rounded bg-amber-500/[0.1] px-1.5 py-0.5 text-[11px] font-semibold text-accent-amber">{item.severity.low} baja{item.severity.low === 1 ? "" : "s"}</span>}
+              {totalSeverity === 0 && <span className="rounded bg-emerald-500/[0.1] px-1.5 py-0.5 text-[11px] font-semibold text-accent-emerald">Sin issues</span>}
+            </div>
+          </>
+        ) : (
+          <div className="border-t border-border-subtle px-[18px] py-3 text-xs text-subtle">No hay evaluaciones con resultados todavía.</div>
+        )}
+        <div className="flex items-center gap-2 border-t border-border-subtle px-[18px] py-3">
+          <span className="text-[11px] text-subtle">{item.evaluators_count} evaluador{item.evaluators_count === 1 ? "" : "es"}</span>
+          <span className="text-[11px] text-subtle">·</span>
+          <span className="text-[11px] text-subtle">{item.evaluations_count} evaluación{item.evaluations_count === 1 ? "" : "es"}</span>
+          <span className="ml-auto text-[11px] text-subtle">{formatDate(item.last_evaluation_at)}</span>
+          {hasData && <ArrowRight className="h-3.5 w-3.5 text-accent-indigo opacity-40 transition-opacity group-hover:opacity-100" />}
+        </div>
+      </article>
+    </Link>
+  )
+}

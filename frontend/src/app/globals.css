@@ -13,35 +13,57 @@
   --color-brand-900: #4c1d95;
   --color-brand-950: #2e1065;
 
+  --color-background: #030303;
+  --color-foreground: #fafafa;
   --color-bg-deep: #030303;
   --color-bg-card: #0a0a0a;
+  --color-bg-elevated: #1c1f2b;
   --color-bg-sidebar: #050505;
+  --color-surface-tint: rgba(255, 255, 255, 0.03);
   --color-border-subtle: rgba(255, 255, 255, 0.08);
   --color-border-hover: rgba(255, 255, 255, 0.15);
-  
+  --color-muted: #8b91a8;
+  --color-subtle: #5f6580;
+
+  --color-accent-indigo: #a5b4fc;
+  --color-accent-rose: #fb7185;
+  --color-accent-orange: #fb923c;
+  --color-accent-emerald: #6ee7b7;
+  --color-accent-amber: #fbbf24;
+  --color-accent-brand: #a78bfa;
+
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
 }
 
 :root {
-  --background: #030303;
-  --foreground: #fafafa;
   --sidebar-width: 260px;
 }
 
 :root.light {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
   --color-bg-deep: #f8fafc;
   --color-bg-card: #ffffff;
+  --color-bg-elevated: #f1f5f9;
   --color-bg-sidebar: #ffffff;
+  --color-surface-tint: rgba(15, 23, 42, 0.035);
   --color-border-subtle: rgba(15, 23, 42, 0.12);
   --color-border-hover: rgba(15, 23, 42, 0.2);
+  --color-muted: #475569;
+  --color-subtle: #64748b;
+
+  --color-accent-indigo: #4f46e5;
+  --color-accent-rose: #e11d48;
+  --color-accent-orange: #ea580c;
+  --color-accent-emerald: #059669;
+  --color-accent-amber: #b45309;
+  --color-accent-brand: #7c3aed;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-background);
+  color: var(--color-foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -67,4 +89,15 @@ body {
   border-color: var(--color-border-hover);
   background: rgba(255, 255, 255, 0.05);
   transform: translateY(-2px);
+}
+
+@keyframes analytics-insight-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

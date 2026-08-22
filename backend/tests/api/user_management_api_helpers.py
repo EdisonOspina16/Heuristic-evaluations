@@ -82,12 +82,14 @@ def seed_user(
     active: bool = True,
     role_names: list[str] | None = None,
     direct_permission_codes: list[str] | None = None,
+    created_by: int | None = None,
 ) -> User:
     user = User(
         nombre=nombre,
         email=email or unique_email(),
         password_hash=get_password_hash(password),
         active=active,
+        creado_por=created_by,
     )
     db_session.add(user)
     db_session.flush()

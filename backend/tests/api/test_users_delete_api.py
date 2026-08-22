@@ -6,7 +6,7 @@ from user_management_api_helpers import auth_headers, seed_admin, seed_evaluator
 def test_delete_user_deletes_evaluator(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    target = seed_user(db_session, role_names=["EVALUADOR"])
+    target = seed_user(db_session, role_names=["EVALUADOR"], created_by=admin.id)
 
     # Act
     response = api_client.delete(f"/users/{target.id}", headers=auth_headers(admin))
@@ -31,7 +31,7 @@ def test_delete_user_blocks_last_registered_admin(api_client, db_session):
 def test_delete_user_allows_admin_delete_when_another_admin_exists(api_client, db_session):
     # Arrange
     admin = seed_admin(db_session)
-    second_admin = seed_user(db_session, role_names=["ADMIN"])
+    second_admin = seed_user(db_session, role_names=["ADMIN"], created_by=admin.id)
 
     # Act
     response = api_client.delete(f"/users/{second_admin.id}", headers=auth_headers(admin))

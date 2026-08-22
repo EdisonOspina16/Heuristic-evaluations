@@ -86,7 +86,7 @@ pipeline {
                                 . venv/bin/activate
                                 pip install --upgrade pip
                                 pip install -r requirements.txt
-                                pytest tests/unit_test --cov=src --cov-report=xml:coverage.xml
+                                pytest tests/unit_test --cov=src --cov=analytics --cov-report=xml:coverage.xml
                             '''
                         }
                     }

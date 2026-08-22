@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.interfaces.routes import router as main_router
 from src.infrastructure.database import init_db
+from analytics.src.interfaces.api.analytics import router as analytics_router
 import uvicorn
 import os
 
@@ -16,6 +17,7 @@ app.add_middleware(
 )
 
 app.include_router(main_router)
+app.include_router(analytics_router)
 
 @app.on_event("startup")
 def startup():

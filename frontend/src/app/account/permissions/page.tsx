@@ -94,7 +94,7 @@ export default function GlobalPermissionsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-10 h-10 animate-spin text-brand-400" />
+        <Loader2 className="w-10 h-10 animate-spin text-accent-brand" />
       </div>
     );
   }
@@ -103,11 +103,11 @@ export default function GlobalPermissionsPage() {
     <div className="p-8 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-            <Key className="w-8 h-8 text-brand-400" />
+          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
+            <Key className="w-8 h-8 text-accent-brand" />
             Permisos Globales
           </h1>
-          <p className="text-zinc-400 mt-1">
+          <p className="text-muted mt-1">
             Asigna permisos directos a usuarios independientemente de su rol.
           </p>
         </div>
@@ -115,17 +115,17 @@ export default function GlobalPermissionsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* User Selection */}
-        <Card className="bg-zinc-900/50 border-white/5 backdrop-blur-xl rounded-3xl h-fit">
+        <Card className="bg-bg-elevated/50 border-border-subtle backdrop-blur-xl rounded-3xl h-fit">
           <CardHeader>
             <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <User className="w-4 h-4 text-zinc-500" />
+              <User className="w-4 h-4 text-subtle" />
               Seleccionar Usuario
             </CardTitle>
             <div className="relative mt-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-subtle" />
               <Input 
                 placeholder="Buscar..." 
-                className="pl-9 bg-zinc-800/50 border-white/10 rounded-xl"
+                className="pl-9 bg-surface-tint/50 border-border-subtle rounded-xl"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -139,19 +139,19 @@ export default function GlobalPermissionsPage() {
                 className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
                   selectedUser?.id === user.id 
                     ? "bg-brand-500/10 border border-brand-500/20" 
-                    : "hover:bg-white/5 border border-transparent"
+                    : "hover:bg-surface-tint border border-transparent"
                 }`}
               >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                   selectedUser?.id === user.id ? "bg-brand-500 text-white" : "bg-zinc-800 text-zinc-400"
+                   selectedUser?.id === user.id ? "bg-brand-500 text-white" : "bg-surface-tint text-muted"
                 }`}>
                   {user.nombre[0].toUpperCase()}
                 </div>
                 <div className="text-left overflow-hidden">
-                  <p className={`text-sm font-medium truncate ${selectedUser?.id === user.id ? "text-brand-400" : "text-white"}`}>
+                  <p className={`text-sm font-medium truncate ${selectedUser?.id === user.id ? "text-accent-brand" : "text-foreground"}`}>
                     {user.nombre}
                   </p>
-                  <p className="text-[10px] text-zinc-500 truncate">{user.email}</p>
+                  <p className="text-[10px] text-subtle truncate">{user.email}</p>
                 </div>
               </button>
             ))}
@@ -161,20 +161,20 @@ export default function GlobalPermissionsPage() {
         {/* Permissions Checklist */}
         <div className="lg:col-span-2 space-y-6">
           {!selectedUser ? (
-            <Card className="bg-zinc-900/50 border-white/5 border-dashed backdrop-blur-xl rounded-3xl p-20 text-center">
-              <div className="w-16 h-16 bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <User className="w-8 h-8 text-zinc-600" />
+            <Card className="bg-bg-elevated/50 border-border-subtle border-dashed backdrop-blur-xl rounded-3xl p-20 text-center">
+              <div className="w-16 h-16 bg-surface-tint/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <User className="w-8 h-8 text-subtle" />
               </div>
-              <p className="text-zinc-500">Selecciona un usuario para administrar sus permisos.</p>
+              <p className="text-subtle">Selecciona un usuario para administrar sus permisos.</p>
             </Card>
           ) : (
-            <Card className="bg-zinc-900/50 border-white/5 backdrop-blur-xl rounded-3xl overflow-hidden">
-              <CardHeader className="border-b border-white/5 flex flex-row items-center justify-between">
+            <Card className="bg-bg-elevated/50 border-border-subtle backdrop-blur-xl rounded-3xl overflow-hidden">
+              <CardHeader className="border-b border-border-subtle flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="text-lg flex items-center gap-2">
-                    Permisos para <span className="text-brand-400">{selectedUser.nombre}</span>
+                    Permisos para <span className="text-accent-brand">{selectedUser.nombre}</span>
                   </CardTitle>
-                  <p className="text-xs text-zinc-500 mt-1">
+                  <p className="text-xs text-subtle mt-1">
                     Los cambios realizados aquí se aplicarán directamente como permisos globales.
                   </p>
                 </div>
@@ -202,16 +202,16 @@ export default function GlobalPermissionsPage() {
                         className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
                           isChecked 
                             ? "bg-brand-500/5 border-brand-500/20 shadow-lg shadow-brand-500/5" 
-                            : "bg-zinc-800/20 border-white/5 hover:border-white/10"
+                            : "bg-surface-tint/20 border-border-subtle hover:border-border-subtle"
                         } ${isFromRole ? "opacity-60 cursor-not-allowed" : ""}`}
                       >
                         <div className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
-                          isChecked ? "bg-brand-500 text-white" : "bg-zinc-800 border border-white/10"
+                          isChecked ? "bg-brand-500 text-white" : "bg-surface-tint border border-border-subtle"
                         }`}>
                           {(isChecked || isFromRole) && <CheckCircle2 className="w-3 h-3" />}
                         </div>
                         <div className="flex-1">
-                          <div className="text-sm font-semibold text-white flex items-center gap-2">
+                          <div className="text-sm font-semibold text-foreground flex items-center gap-2">
                             {perm.name}
                             {isFromRole && (
                               <Badge className="bg-amber-500/10 text-amber-400 text-[8px] font-bold py-0 h-4 uppercase">
@@ -219,7 +219,7 @@ export default function GlobalPermissionsPage() {
                               </Badge>
                             )}
                           </div>
-                          <p className="text-xs text-zinc-500 mt-1">{perm.description}</p>
+                          <p className="text-xs text-subtle mt-1">{perm.description}</p>
                         </div>
                       </div>
                     );

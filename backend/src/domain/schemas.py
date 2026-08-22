@@ -44,6 +44,7 @@ class UsuarioLogin(BaseModel):
 class UsuarioResponse(UsuarioBase):
     id: int
     created_at: datetime
+    creado_por: Optional[int] = None
     roles: List[RoleResponse] = []
     direct_permissions: List[PermissionResponse] = []
     class Config:

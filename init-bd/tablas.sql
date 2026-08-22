@@ -51,7 +51,10 @@ CREATE TABLE users (
   email         VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   active        BOOLEAN DEFAULT TRUE,
-  created_at    TIMESTAMP DEFAULT NOW()
+  created_at    TIMESTAMP DEFAULT NOW(),
+  -- Admin que creó este usuario. NULL = se auto-registró (raíz de su propia "burbuja");
+  -- cada admin solo ve/gestiona los usuarios donde creado_por = su propio id.
+  creado_por    INT REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE user_roles (
@@ -187,6 +190,19 @@ CREATE TABLE evaluation_progress (
   saved_state TEXT,
   updated_at TIMESTAMP DEFAULT NOW()
 );
+
+-- ==========================================
+-- 6b. ÍNDICES
+-- ==========================================
+-- Postgres no indexa automáticamente las columnas FK (solo las PK). Estas
+-- son las que se consultan en cada carga de página de analíticas/proyectos.
+CREATE INDEX IF NOT EXISTS idx_users_creado_por ON users(creado_por);
+CREATE INDEX IF NOT EXISTS idx_proyectos_creado_por ON proyectos(creado_por);
+CREATE INDEX IF NOT EXISTS idx_evaluaciones_proyecto_id ON evaluaciones(proyecto_id);
+CREATE INDEX IF NOT EXISTS idx_dimensiones_plantilla_id ON dimensiones(plantilla_id);
+CREATE INDEX IF NOT EXISTS idx_preguntas_dimension_id ON preguntas(dimension_id);
+CREATE INDEX IF NOT EXISTS idx_evaluator_project_assignments_project_id ON evaluator_project_assignments(project_id);
+CREATE INDEX IF NOT EXISTS idx_evaluator_project_assignments_evaluator_id ON evaluator_project_assignments(evaluator_id);
 
 -- ==========================================
 -- 7. SEED DATA - RBAC

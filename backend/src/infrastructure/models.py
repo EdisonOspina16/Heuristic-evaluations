@@ -65,8 +65,12 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     active = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
+    # Admin que creó este usuario (NULL para quien se auto-registró: es raíz de su propia
+    # "burbuja" y solo el admin que crea evaluadores/otros admins ve lo que él mismo creó).
+    creado_por = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
 
     # Relationships
+    creador = relationship("User", remote_side=[id], backref="usuarios_creados")
     roles = relationship("Role", secondary="user_roles", back_populates="users")
     direct_permissions = relationship("Permission", secondary="user_permissions", back_populates="users")
     
@@ -81,7 +85,7 @@ class Proyecto(Base):
     nombre = Column(String(255), nullable=False)
     descripcion = Column(Text)
     cliente = Column(String(255))
-    creado_por = Column(Integer, ForeignKey("users.id"))
+    creado_por = Column(Integer, ForeignKey("users.id"), index=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     # Relationships
@@ -101,8 +105,8 @@ class EvaluatorProjectAssignment(Base):
     __tablename__ = "evaluator_project_assignments"
 
     id = Column(Integer, primary_key=True, index=True)
-    evaluator_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    project_id = Column(Integer, ForeignKey("proyectos.id", ondelete="CASCADE"), nullable=False)
+    evaluator_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    project_id = Column(Integer, ForeignKey("proyectos.id", ondelete="CASCADE"), nullable=False, index=True)
     # Store allowed evaluation type identifiers (e.g., UI, UX, Accessibility) as a JSON array
     allowed_evaluation_types = Column(Text, nullable=True)  # JSON string list
     role = Column(String(255), default="Evaluator")  # description like frontend, UI, UX, etc.
@@ -143,7 +147,7 @@ class Dimension(Base):
     __tablename__ = "dimensiones"
 
     id = Column(Integer, primary_key=True, index=True)
-    plantilla_id = Column(Integer, ForeignKey("plantillas.id", ondelete="CASCADE"))
+    plantilla_id = Column(Integer, ForeignKey("plantillas.id", ondelete="CASCADE"), index=True)
     nombre = Column(String(255), nullable=False)
     orden = Column(Integer, nullable=False)
 
@@ -155,7 +159,7 @@ class Pregunta(Base):
     __tablename__ = "preguntas"
 
     id = Column(Integer, primary_key=True, index=True)
-    dimension_id = Column(Integer, ForeignKey("dimensiones.id", ondelete="CASCADE"))
+    dimension_id = Column(Integer, ForeignKey("dimensiones.id", ondelete="CASCADE"), index=True)
     texto = Column(Text, nullable=False)
     texto_en = Column(Text)
     orden = Column(Integer, nullable=False)
@@ -191,7 +195,7 @@ class Evaluacion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     plantilla_id = Column(Integer, ForeignKey("plantillas.id"))
-    proyecto_id = Column(Integer, ForeignKey("proyectos.id"))
+    proyecto_id = Column(Integer, ForeignKey("proyectos.id"), index=True)
     evaluador_id = Column(Integer, ForeignKey("users.id"))
     perfil = Column(String(100))
     estudios = Column(String(100))

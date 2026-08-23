@@ -1,10 +1,17 @@
+import os
+from pathlib import Path
+
+import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.interfaces.routes import router as main_router
-from src.infrastructure.database import init_db
+
+# Carga el .env de esta carpeta, sin depender del directorio desde el que se ejecute.
+load_dotenv(Path(__file__).with_name(".env"))
+
 from analytics.src.interfaces.api.analytics import router as analytics_router
-import uvicorn
-import os
+from src.infrastructure.database import init_db
+from src.interfaces.routes import router as main_router
 
 app = FastAPI(title="Heuristic Evaluations")
 
@@ -24,5 +31,6 @@ def startup():
     init_db()
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5000))
+    port = int(os.getenv("BACKEND_PORT", os.getenv("PORT", 8001)))
+    print(f"Iniciando backend en el puerto {port}")
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

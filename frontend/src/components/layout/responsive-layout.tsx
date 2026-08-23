@@ -7,6 +7,7 @@ import { TopBar } from "./TopBar"
 import { Button } from "@/components/ui/button"
 import { usePathname, useRouter } from "next/navigation"
 import { applyAppearance, getStoredFontScale, getStoredTheme } from "@/lib/appearance"
+import { hasActiveTranslation } from "@/lib/google-translate"
 
 /**
  * Layout principal responsivo que incluye el Sidebar lateral y el área de contenido.
@@ -27,7 +28,11 @@ export function ResponsiveLayout({ children }: { children: React.ReactNode }) {
     if (pathname === "/login" || pathname === "/register") {
       setIsCheckingAuth(false)
     } else if (!token) {
-      router.push("/login")
+      if (hasActiveTranslation()) {
+        window.location.assign("/login")
+      } else {
+        router.push("/login")
+      }
     } else {
       setIsCheckingAuth(false)
     }

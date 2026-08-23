@@ -22,6 +22,7 @@ import {
 import { cn, Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import { authService, User as UserType } from "@/features/auth/services/auth.service"
+import { hasActiveTranslation } from "@/lib/google-translate"
 import { projectsService, Project } from "@/features/projects/services/projects.service"
 
 const navItems = [
@@ -65,7 +66,11 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const handleLogout = () => {
     authService.logout()
-    router.push("/login")
+    if (hasActiveTranslation()) {
+      window.location.assign("/login")
+    } else {
+      router.push("/login")
+    }
   }
 
   const isAdmin = user?.rol === "ADMIN"

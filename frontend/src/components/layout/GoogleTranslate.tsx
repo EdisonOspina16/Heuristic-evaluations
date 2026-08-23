@@ -2,6 +2,7 @@
 
 import Script from "next/script"
 import { useEffect, useState } from "react"
+import { hasActiveTranslation } from "@/lib/google-translate"
 
 declare global {
   interface Window {
@@ -18,10 +19,6 @@ declare global {
 }
 
 const elementId = "google_translate_element"
-
-function hasActiveTranslation() {
-  return document.cookie.split("; ").some((cookie) => cookie.startsWith("googtrans="))
-}
 
 export function GoogleTranslate() {
   const [scriptLoaded, setScriptLoaded] = useState(false)

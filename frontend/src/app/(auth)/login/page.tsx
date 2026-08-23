@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { authService } from "@/features/auth/services/auth.service";
+import { hasActiveTranslation } from "@/lib/google-translate";
 
 /**
  * Página de inicio de sesión.
@@ -26,7 +27,11 @@ export default function LoginPage() {
 
     try {
       await authService.login(email, password);
-      router.push("/dashboard");
+      if (hasActiveTranslation()) {
+        window.location.assign("/dashboard");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err: any) {
       setError(
         err.response?.data?.detail || "Error al iniciar sesión. Verifica tus credenciales."

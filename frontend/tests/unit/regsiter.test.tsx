@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { authService } from "@/features/auth/services/auth.service";
+import { navigateAfterAuth } from "@/lib/google-translate";
 import RegisterPage from "../../src/app/(auth)/register/page";
 
 const userEvent = {
@@ -26,12 +27,6 @@ const userEvent = {
     },
 };
 
-const mockPush = jest.fn();
-
-jest.mock("next/navigation", () => ({
-    useRouter: () => ({ push: mockPush }),
-}));
-
 jest.mock("next/image", () => ({
     __esModule: true,
     default: ({ alt }: { alt: string }) => <img alt={alt} />,
@@ -48,6 +43,10 @@ jest.mock("@/features/auth/services/auth.service", () => ({
         register: jest.fn(),
         login: jest.fn(),
     },
+}));
+
+jest.mock("@/lib/google-translate", () => ({
+    navigateAfterAuth: jest.fn(),
 }));
 
 const goToStep2 = async (nombre = "Juan Pérez") => {
@@ -268,7 +267,7 @@ describe("RegisterPage", () => {
             render(<RegisterPage />);
             await completeForm();
             await waitFor(() => {
-                expect(mockPush).toHaveBeenCalledWith("/dashboard");
+                expect(navigateAfterAuth).toHaveBeenCalledWith("/dashboard");
             });
         });
 
@@ -342,7 +341,7 @@ describe("RegisterPage", () => {
             render(<RegisterPage />);
             await completeForm();
             await waitFor(() => {
-                expect(mockPush).not.toHaveBeenCalled();
+                expect(navigateAfterAuth).not.toHaveBeenCalled();
             });
         });
 

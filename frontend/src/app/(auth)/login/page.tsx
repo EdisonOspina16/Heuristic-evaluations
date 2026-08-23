@@ -3,11 +3,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { authService } from "@/features/auth/services/auth.service";
-import { hasActiveTranslation } from "@/lib/google-translate";
+import { navigateAfterAuth } from "@/lib/google-translate";
 
 /**
  * Página de inicio de sesión.
@@ -18,26 +17,25 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    let isNavigating = false;
 
     try {
       await authService.login(email, password);
-      if (hasActiveTranslation()) {
-        window.location.assign("/dashboard");
-      } else {
-        router.push("/dashboard");
-      }
+      isNavigating = true;
+      navigateAfterAuth("/dashboard");
     } catch (err: any) {
       setError(
         err.response?.data?.detail || "Error al iniciar sesión. Verifica tus credenciales."
       );
     } finally {
-      setLoading(false);
+      // location.assign starts a document navigation. Updating the current
+      // React tree after that can race with a browser translator.
+      if (!isNavigating) setLoading(false);
     }
   };
 

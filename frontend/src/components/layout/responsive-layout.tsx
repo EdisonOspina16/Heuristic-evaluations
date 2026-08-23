@@ -5,9 +5,9 @@ import { Menu, FolderKanban } from "lucide-react"
 import { Sidebar } from "./sidebar"
 import { TopBar } from "./TopBar"
 import { Button } from "@/components/ui/button"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { applyAppearance, getStoredFontScale, getStoredTheme } from "@/lib/appearance"
-import { hasActiveTranslation } from "@/lib/google-translate"
+import { navigateAfterAuth } from "@/lib/google-translate"
 
 /**
  * Layout principal responsivo que incluye el Sidebar lateral y el área de contenido.
@@ -17,7 +17,6 @@ export function ResponsiveLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const pathname = usePathname()
-  const router = useRouter()
 
   useEffect(() => {
     applyAppearance(getStoredTheme(), getStoredFontScale())
@@ -28,15 +27,11 @@ export function ResponsiveLayout({ children }: { children: React.ReactNode }) {
     if (pathname === "/login" || pathname === "/register") {
       setIsCheckingAuth(false)
     } else if (!token) {
-      if (hasActiveTranslation()) {
-        window.location.assign("/login")
-      } else {
-        router.push("/login")
-      }
+      navigateAfterAuth("/login")
     } else {
       setIsCheckingAuth(false)
     }
-  }, [pathname, router])
+  }, [pathname])
 
   if (pathname === "/login" || pathname === "/register") {
     return <>{children}</>

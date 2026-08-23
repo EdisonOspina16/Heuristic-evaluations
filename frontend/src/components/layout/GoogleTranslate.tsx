@@ -2,6 +2,7 @@
 
 import Script from "next/script"
 import { useEffect, useState } from "react"
+import { Globe2 } from "lucide-react"
 import { hasActiveTranslation } from "@/lib/google-translate"
 
 declare global {
@@ -95,6 +96,7 @@ export function GoogleTranslate() {
 
   return (
     <div className="google-translate-shell" aria-label="Selector de idioma">
+      <Globe2 className="google-translate-icon" aria-hidden="true" />
       <span className="google-translate-label">Idioma</span>
       <div id={elementId} />
       <Script

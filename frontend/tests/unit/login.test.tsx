@@ -1,16 +1,11 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { authService } from "@/features/auth/services/auth.service";
+import { navigateAfterAuth } from "@/lib/google-translate";
 import LoginPage from "../../src/app/(auth)/login/page";
 
 
 // ── Mocks globales 
-
-const mockPush = jest.fn();
-
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: mockPush }),
-}));
 
 jest.mock("next/image", () => ({
   __esModule: true,
@@ -27,6 +22,10 @@ jest.mock("@/features/auth/services/auth.service", () => ({
   authService: {
     login: jest.fn(),
   },
+}));
+
+jest.mock("@/lib/google-translate", () => ({
+  navigateAfterAuth: jest.fn(),
 }));
 
 // ── Helper 
@@ -171,7 +170,7 @@ describe("LoginPage", () => {
 
       // Assert
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith("/dashboard");
+        expect(navigateAfterAuth).toHaveBeenCalledWith("/dashboard");
       });
     });
 
@@ -237,7 +236,7 @@ describe("LoginPage", () => {
       ).not.toBeInTheDocument();
     });
 
-    test("TC-L14 — loading vuelve a false después del login exitoso (finally)", async () => {
+    test("TC-L14 — tras un login exitoso inicia una navegación de documento", async () => {
       // Arrange
       (authService.login as jest.Mock).mockResolvedValueOnce({});
       render(<LoginPage />);
@@ -247,9 +246,7 @@ describe("LoginPage", () => {
 
       // Assert
       await waitFor(() => {
-        expect(
-          screen.getByRole("button", { name: /iniciar sesión/i })
-        ).not.toBeDisabled();
+        expect(navigateAfterAuth).toHaveBeenCalledWith("/dashboard");
       });
     });
 
@@ -321,7 +318,7 @@ describe("LoginPage", () => {
 
       // Assert
       await waitFor(() => {
-        expect(mockPush).not.toHaveBeenCalled();
+        expect(navigateAfterAuth).not.toHaveBeenCalled();
       });
     });
 

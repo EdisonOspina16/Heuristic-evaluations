@@ -3,11 +3,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { User, Mail, Lock, CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
 import { authService } from "@/features/auth/services/auth.service";
-import { hasActiveTranslation } from "@/lib/google-translate";
+import { navigateAfterAuth } from "@/lib/google-translate";
 
 /**
  * Página de registro de nuevos usuarios.
@@ -22,7 +21,6 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleNext = () => {
     if (step === 1 && formData.nombre) setStep(2);
@@ -40,11 +38,7 @@ export default function RegisterPage() {
       await authService.register(formData.nombre, formData.email, formData.password);
       // Auto-login after register
       await authService.login(formData.email, formData.password);
-      if (hasActiveTranslation()) {
-        window.location.assign("/dashboard");
-      } else {
-        router.push("/dashboard");
-      }
+      navigateAfterAuth("/dashboard");
     } catch (err: any) {
       setError(
         err.response?.data?.detail || "Error al registrarse. Inténtalo de nuevo."

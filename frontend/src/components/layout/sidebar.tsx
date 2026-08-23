@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { 
   LayoutDashboard, 
   FolderKanban, 
@@ -22,7 +22,7 @@ import {
 import { cn, Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
 import { authService, User as UserType } from "@/features/auth/services/auth.service"
-import { hasActiveTranslation } from "@/lib/google-translate"
+import { navigateAfterAuth } from "@/lib/google-translate"
 import { projectsService, Project } from "@/features/projects/services/projects.service"
 
 const navItems = [
@@ -45,7 +45,6 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
-  const router = useRouter()
   const [user, setUser] = React.useState<UserType | null>(null)
   const [projects, setProjects] = React.useState<Project[]>([])
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
@@ -66,11 +65,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const handleLogout = () => {
     authService.logout()
-    if (hasActiveTranslation()) {
-      window.location.assign("/login")
-    } else {
-      router.push("/login")
-    }
+    navigateAfterAuth("/login")
   }
 
   const isAdmin = user?.rol === "ADMIN"

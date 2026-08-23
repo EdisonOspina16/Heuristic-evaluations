@@ -19,10 +19,39 @@ declare global {
 
 const elementId = "google_translate_element"
 
+function hasActiveTranslation() {
+  return document.cookie.split("; ").some((cookie) => cookie.startsWith("googtrans="))
+}
+
 export function GoogleTranslate() {
   const [scriptLoaded, setScriptLoaded] = useState(false)
 
   useEffect(() => {
+    const originalPushState = window.history.pushState
+    const originalReplaceState = window.history.replaceState
+    const reloadOnNavigation = (...args: Parameters<History["pushState"]>) => {
+      if (hasActiveTranslation()) {
+        window.location.assign(String(args[2] ?? window.location.href))
+        return
+      }
+      originalPushState.apply(window.history, args)
+    }
+
+    window.history.pushState = reloadOnNavigation
+    window.history.replaceState = (...args: Parameters<History["replaceState"]>) => {
+      if (hasActiveTranslation()) {
+        window.location.assign(String(args[2] ?? window.location.href))
+        return
+      }
+      originalReplaceState.apply(window.history, args)
+    }
+
+    const reloadOnBackForward = () => {
+      if (hasActiveTranslation()) window.location.reload()
+    }
+
+    window.addEventListener("popstate", reloadOnBackForward)
+
     const initializeTranslate = () => {
       if (!window.google?.translate?.TranslateElement) return
 
@@ -44,6 +73,9 @@ export function GoogleTranslate() {
 
     return () => {
       delete window.googleTranslateElementInit
+      window.history.pushState = originalPushState
+      window.history.replaceState = originalReplaceState
+      window.removeEventListener("popstate", reloadOnBackForward)
     }
   }, [scriptLoaded])
 

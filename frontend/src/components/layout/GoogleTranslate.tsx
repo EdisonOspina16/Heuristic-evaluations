@@ -47,7 +47,23 @@ export function GoogleTranslate() {
       if (hasActiveTranslation()) window.location.reload()
     }
 
+    const reloadOnInternalLink = (event: MouseEvent) => {
+      if (!hasActiveTranslation() || event.defaultPrevented || event.button !== 0) return
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+      const link = (event.target as Element).closest("a")
+      if (!link || link.target === "_blank" || link.hasAttribute("download")) return
+
+      const destination = new URL(link.href, window.location.href)
+      if (destination.origin !== window.location.origin || destination.hash === window.location.hash) return
+
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      window.location.assign(destination.href)
+    }
+
     window.addEventListener("popstate", reloadOnBackForward)
+    document.addEventListener("click", reloadOnInternalLink, true)
 
     const initializeTranslate = () => {
       if (!window.google?.translate?.TranslateElement) return
@@ -73,6 +89,7 @@ export function GoogleTranslate() {
       window.history.pushState = originalPushState
       window.history.replaceState = originalReplaceState
       window.removeEventListener("popstate", reloadOnBackForward)
+      document.removeEventListener("click", reloadOnInternalLink, true)
     }
   }, [scriptLoaded])
 

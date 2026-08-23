@@ -69,6 +69,56 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.google-translate-shell {
+  position: fixed;
+  top: 0.75rem;
+  right: 10rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.5rem;
+  background: var(--color-bg-card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.google-translate-label {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.google-translate-shell .goog-te-gadget {
+  color: var(--color-muted) !important;
+  font-family: inherit;
+  font-size: 0;
+}
+
+.google-translate-shell .goog-te-combo {
+  min-height: 1.75rem;
+  max-width: 10rem;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 0.375rem;
+  background: var(--color-bg-elevated);
+  color: var(--color-foreground);
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.25rem 1.75rem 0.25rem 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .google-translate-shell {
+    top: 3.75rem;
+    right: 0.5rem;
+  }
+
+  .google-translate-label {
+    display: none;
+  }
+}
+
 @layer base {
   * {
     border-color: var(--color-border-subtle);

@@ -9,6 +9,10 @@ from ...domain.schemas import (
     IssueItem,
     ProjectAnalyticsResponse,
     ProjectAnalyticsSummary,
+    ProjectAiPayload,
+    AiDimensionSummary,
+    AiEvaluationSummary,
+    AiIssue,
     ProjectInfo,
     ProjectSummaryCard,
     SeverityCounts,
@@ -90,6 +94,131 @@ class AnalyticsService:
             issues=aggregate["issues"],
             evaluators=aggregate["evaluators"],
             timeline=aggregate["timeline"],
+        )
+
+    def get_project_ai_payload(self, project_id: int, user: User) -> Optional[ProjectAiPayload]:
+        proyecto = self.repository.get_project(project_id)
+        if not proyecto or not self.repository.user_has_access(proyecto, user):
+            return None
+        evaluaciones = self.repository.get_project_evaluations(project_id)
+        assignments = self.repository.get_assignments(project_id)
+        aggregate = self._aggregate_from_data(evaluaciones, assignments)
+
+        dimension_map = {}
+        for evaluacion in evaluaciones:
+            for resultado in evaluacion.resultados_dimension:
+                pregunta = next(
+                    (
+                        respuesta.pregunta
+                        for respuesta in evaluacion.respuestas
+                        if respuesta.pregunta
+                        and respuesta.pregunta.dimension_id == resultado.dimension_id
+                    ),
+                    None,
+                )
+                if resultado.dimension_id not in dimension_map:
+                    dimension_map[resultado.dimension_id] = {
+                        "id": resultado.dimension_id,
+                        "name": (
+                            pregunta.dimension.nombre
+                            if pregunta and pregunta.dimension
+                            else f"Dimensión {resultado.dimension_id}"
+                        ),
+                        "averages": [],
+                        "answered": 0,
+                        "warnings": 0,
+                    }
+                bucket = dimension_map[resultado.dimension_id]
+                if resultado.promedio is not None:
+                    bucket["averages"].append(float(resultado.promedio))
+                bucket["answered"] += int(getattr(resultado, "respondidas", 0) or 0)
+                bucket["warnings"] += int(getattr(resultado, "warnings", 0) or 0)
+
+        issue_map = {}
+        for evaluacion in evaluaciones:
+            if not evaluacion.plantilla or evaluacion.plantilla.codigo != HEURISTICA_CODE:
+                continue
+            for respuesta in evaluacion.respuestas:
+                pregunta = respuesta.pregunta
+                opcion = respuesta.opcion
+                if (
+                    not pregunta
+                    or pregunta.tipo_respuesta != "categorico"
+                    or not opcion
+                    or opcion.es_na
+                    or opcion.valor >= 3
+                ):
+                    continue
+
+                key = (pregunta.dimension_id, respuesta.pregunta_id)
+                issue = issue_map.setdefault(
+                    key,
+                    {
+                        "question_id": respuesta.pregunta_id,
+                        "dimension_id": pregunta.dimension_id,
+                        "question": pregunta.texto,
+                        "values": [],
+                        "evaluations": set(),
+                        "comments": [],
+                    },
+                )
+                issue["values"].append(int(opcion.valor))
+                issue["evaluations"].add(evaluacion.id)
+                comment = (respuesta.comentario or "").strip()
+                if comment and comment not in issue["comments"] and len(issue["comments"]) < 3:
+                    issue["comments"].append(comment[:300])
+
+        dimensions = [
+            AiDimensionSummary(
+                id=bucket["id"],
+                name=bucket["name"],
+                average=(
+                    round(sum(bucket["averages"]) / len(bucket["averages"]), 2)
+                    if bucket["averages"]
+                    else None
+                ),
+                answered=bucket["answered"],
+                warnings=bucket["warnings"],
+            )
+            for bucket in dimension_map.values()
+        ]
+        dimensions.sort(key=lambda item: (item.average is None, item.average or 0))
+
+        issues = [
+            AiIssue(
+                question_id=item["question_id"],
+                dimension_id=item["dimension_id"],
+                question=item["question"],
+                values=item["values"],
+                agreement_count=len(item["evaluations"]),
+                agreement_total=len(evaluaciones),
+                comments=item["comments"],
+            )
+            for item in issue_map.values()
+        ]
+        issues.sort(key=lambda item: (-item.agreement_count, min(item.values)))
+
+        project_info = {
+            "id": proyecto.id,
+            "nombre": proyecto.nombre,
+            "descripcion": proyecto.descripcion,
+            "cliente": proyecto.cliente,
+        }
+        evaluations = [
+            AiEvaluationSummary(
+                id=evaluacion.id,
+                status=evaluacion.estado,
+                date=evaluacion.created_at.date().isoformat() if evaluacion.created_at else None,
+            )
+            for evaluacion in evaluaciones
+        ]
+
+        return ProjectAiPayload(
+            project=project_info,
+            summary=aggregate["summary"],
+            dimensions=dimensions,
+            issues=issues,
+            evaluations=evaluations,
         )
 
     def _build_summary_card(self, proyecto, evaluaciones, assignments) -> ProjectSummaryCard:

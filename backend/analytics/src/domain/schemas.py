@@ -90,3 +90,36 @@ class ProjectAnalyticsResponse(BaseModel):
     issues: List[IssueItem] = []
     evaluators: List[EvaluatorMetric] = []
     timeline: List[TimelinePoint] = []
+
+
+class AiDimensionSummary(BaseModel):
+    id: int
+    name: str
+    average: Optional[float] = None
+    answered: int = 0
+    warnings: int = 0
+
+
+class AiIssue(BaseModel):
+    question_id: int
+    dimension_id: int
+    question: str
+    values: List[int] = []
+    agreement_count: int = 0
+    agreement_total: int = 0
+    comments: List[str] = []
+
+
+class AiEvaluationSummary(BaseModel):
+    id: int
+    status: str
+    date: Optional[str] = None
+
+
+class ProjectAiPayload(BaseModel):
+    format_version: str = "1"
+    project: ProjectInfo
+    summary: ProjectAnalyticsSummary
+    dimensions: List[AiDimensionSummary] = []
+    issues: List[AiIssue] = []
+    evaluations: List[AiEvaluationSummary] = []

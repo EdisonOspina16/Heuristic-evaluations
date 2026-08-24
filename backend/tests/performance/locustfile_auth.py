@@ -2,8 +2,6 @@ from locust import HttpUser, task, between, events
 import time
 import json
 
-HOST = "http://localhost:5000"
-
 EXISTING_USER = {
    "nombre": "Cypress Tester",
     "email": "cypress.tester@example.com",

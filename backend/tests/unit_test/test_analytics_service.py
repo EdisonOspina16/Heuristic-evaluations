@@ -236,3 +236,43 @@ class TestGetProjectAnalytics:
         result = service.get_project_analytics(1, MagicMock())
 
         assert result is None
+
+
+class TestProjectAiPayload:
+    def test_construye_payload_compacto_con_resumen_y_hallazgos(self):
+        service = _service()
+        proyecto = SimpleNamespace(
+            id=1,
+            nombre="Proyecto Demo",
+            descripcion="Portal",
+            cliente="Acme",
+        )
+        pregunta = _pregunta(1, texto="El estado de la solicitud es visible")
+        evaluacion = _evaluacion(
+            101,
+            evaluador_id=7,
+            evaluador=_evaluador(7, "No debe salir"),
+            respuestas=[
+                _respuesta(
+                    12,
+                    pregunta,
+                    opcion=_opcion(0),
+                    comentario="No muestra confirmación",
+                )
+            ],
+            resultados=[_resultado(1, 0.0)],
+        )
+        service.repository.get_project.return_value = proyecto
+        service.repository.user_has_access.return_value = True
+        service.repository.get_project_evaluations.return_value = [evaluacion]
+        service.repository.get_assignments.return_value = []
+
+        payload = service.get_project_ai_payload(1, MagicMock())
+
+        assert payload.project.id == 1
+        assert payload.summary.total_issues == 1
+        assert payload.dimensions[0].average == 0.0
+        assert payload.issues[0].question_id == 12
+        assert payload.issues[0].agreement_count == 1
+        assert payload.issues[0].comments == ["No muestra confirmación"]
+        assert "evaluator_name" not in payload.model_dump()

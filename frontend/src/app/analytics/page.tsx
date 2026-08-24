@@ -75,7 +75,7 @@ export default function AnalyticsPage() {
   )
 }
 
-function ProjectSection({ title, items, muted = false }: { title: string; items: ProjectSummaryCard[]; muted?: boolean }) {
+function ProjectSection({ title, items, muted = false }: { readonly title: string; readonly items: ProjectSummaryCard[]; readonly muted?: boolean }) {
   return (
     <section className="mb-8">
       <h2 className="mb-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.07em] text-subtle">{title}</h2>
@@ -88,7 +88,7 @@ function ProjectSection({ title, items, muted = false }: { title: string; items:
   )
 }
 
-function ProjectCard({ item, muted }: { item: ProjectSummaryCard; muted: boolean }) {
+function ProjectCard({ item, muted }: { readonly item: ProjectSummaryCard; readonly muted: boolean }) {
   const hasData = !muted
   const totalSeverity = item.severity.high + item.severity.medium + item.severity.low
   const statusColor = STATUS_COLORS[item.status] || STATUS_COLORS["Sin datos"]

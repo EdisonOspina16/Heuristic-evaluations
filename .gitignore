@@ -18,3 +18,8 @@ src/lighthouse/reports/
 .auth-cache.json
 
 .claude
+
+# SonarQube scanner temp output (no debe versionarse)
+**/.scannerwork/.sonartmp/
+**/.scannerwork/scanner-report/
+**/.sonar/

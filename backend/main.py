@@ -19,6 +19,10 @@ app.add_middleware(
 app.include_router(main_router)
 app.include_router(analytics_router)
 
+@app.get("/")
+def root():
+    return "UX evaluations"
+
 @app.on_event("startup")
 def startup():
     init_db()

@@ -5,7 +5,6 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { 
   LayoutDashboard, 
-  FolderKanban, 
   ClipboardCheck, 
   BarChart3, 
   Settings,
@@ -75,10 +74,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Header */}
       <div className="h-14 flex items-center justify-between px-6 border-b border-border-subtle">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center">
-            <FolderKanban className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-semibold text-sm tracking-tight">HeuristicApp</span>
+          <span className="font-semibold text-sm tracking-tight">UX-Evaluations</span>
         </div>
         
         {/* Close Button (Mobile Only) */}

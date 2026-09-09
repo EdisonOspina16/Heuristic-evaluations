@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Menu, FolderKanban } from "lucide-react"
+import { Menu } from "lucide-react"
 import { Sidebar } from "./sidebar"
 import { TopBar } from "./TopBar"
 import { Button } from "@/components/ui/button"
@@ -47,10 +47,7 @@ export function ResponsiveLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile Top Bar */}
       <header className="lg:hidden h-14 border-b border-border-subtle bg-bg-sidebar px-4 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-brand-600 flex items-center justify-center">
-            <FolderKanban className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-semibold text-sm">HeuristicApp</span>
+          <span className="font-semibold text-sm">UX-Evaluations</span>
         </div>
         <div className="flex items-center gap-1">
           <TopBar />

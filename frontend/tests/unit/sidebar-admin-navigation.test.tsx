@@ -53,7 +53,7 @@ describe("Sidebar administration navigation", () => {
     render(<Sidebar />);
 
     // Assert
-    await waitFor(() => expect(screen.getByText("HeuristicApp")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("UX-Evaluations")).toBeInTheDocument());
     expect(screen.queryByText("Administración")).toBeNull();
     expect(screen.queryByRole("link", { name: /usuarios/i })).toBeNull();
   });

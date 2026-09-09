@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HeuristicApp | Evaluaciones Heuristicas",
+  title: "UX-Evaluations | Evaluaciones Heuristicas",
   description: "Modern heuristic evaluation",
 };
 
